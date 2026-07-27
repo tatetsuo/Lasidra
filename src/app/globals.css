@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+/* ============================================
+   UFPI !AVISA! — Design System
+   Paleta Institucional UFPI + Lasidra
+   ============================================ */
+
+@theme {
+  /* Primary — Azul UFPI */
+  --color-primary: #003366;
+  --color-primary-light: #004A99;
+  --color-primary-dark: #002244;
+  --color-primary-50: #E6EEF5;
+  --color-primary-100: #B3CCE0;
+  --color-primary-200: #809FCA;
+  --color-primary-300: #4D73B5;
+  --color-primary-400: #1A479F;
+  --color-primary-500: #003366;
+  --color-primary-600: #002B57;
+  --color-primary-700: #002244;
+  --color-primary-800: #001933;
+  --color-primary-900: #001122;
+
+  /* Secondary — Dourado/Âmbar */
+  --color-secondary: #D4A017;
+  --color-secondary-light: #F0C850;
+  --color-secondary-dark: #B8860B;
+  --color-secondary-50: #FDF8E8;
+  --color-secondary-100: #F9ECBB;
+  --color-secondary-200: #F5E08E;
+  --color-secondary-300: #F0D461;
+  --color-secondary-400: #ECC834;
+  --color-secondary-500: #D4A017;
+  --color-secondary-600: #B8860B;
+  --color-secondary-700: #8B6508;
+  --color-secondary-800: #5E4406;
+  --color-secondary-900: #312303;
+
+  /* Neutrals */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F5F7FA;
+  --color-bg-tertiary: #E8ECF1;
+  --color-text-primary: #1A1A2E;
+  --color-text-secondary: #4A5568;
+  --color-text-muted: #718096;
+  --color-border: #D1D5DB;
+  --color-border-light: #E5E7EB;
+
+  /* Alerts */
+  --color-alert-red: #DC2626;
+  --color-alert-orange: #EA580C;
+  --color-alert-green: #16A34A;
+  --color-alert-blue: #2563EB;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --shadow-header: 0 2px 8px rgba(0, 51, 102, 0.08);
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+}
+
+/* ============================================
+   Global Styles
+   ============================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(212, 160, 23, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Stagger delays for sequential animations */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* ============================================
+   Custom Utilities
+   ============================================ */
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-gradient-hero {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%);
+}
+
+.bg-gradient-hero-overlay {
+  background: linear-gradient(180deg, rgba(0, 34, 68, 0.85) 0%, rgba(0, 51, 102, 0.7) 100%);
+}
+
+/* ============================================
+   Leaflet Custom Styles
+   ============================================ */
+
+/* Remove default DivIcon background */
+.custom-dam-marker {
+  background: none !important;
+  border: none !important;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
