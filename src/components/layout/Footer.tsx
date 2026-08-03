@@ -141,8 +141,17 @@ export default function Footer() {
             {/* Contador de Visitantes */}
             <VisitorCounter />
             <p className="text-white/30">
-              Desenvolvido com apoio do{" "}
-              <span className="text-secondary/60">UFPI !AVISA!</span>
+              Desenvolvido por{" "}
+              <a
+                href="https://github.com/tatetsuo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white/70 transition-colors underline decoration-transparent hover:decoration-white/30"
+              >
+                Gabriel Maia
+              </a>{" "}
+              em auxílio com o{" "}
+              <span className="text-secondary/60">LASIDRA</span>
             </p>
           </div>
         </div>

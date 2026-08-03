@@ -50,19 +50,9 @@ const equipe = [
     area: "Recursos Hídricos e Hidrologia",
   },
   {
-    nome: "Prof. Dr. [Nome do Pesquisador]",
+    nome: "Prof. Dra. Mayra Fernandes Nobre",
     cargo: "Pesquisador Sênior",
     area: "Geoprocessamento e SIG",
-  },
-  {
-    nome: "Prof. Dr. [Nome do Pesquisador]",
-    cargo: "Pesquisador",
-    area: "Meteorologia e Climatologia",
-  },
-  {
-    nome: "[Nome do Mestrando/Doutorando]",
-    cargo: "Estudante de Pós-Graduação",
-    area: "Simulações Hidrológicas",
   },
 ];
 
@@ -211,14 +201,14 @@ export default function QuemSomosPage() {
                   {membro.nome.charAt(0) === "["
                     ? "?"
                     : membro.nome
-                        .split(" ")
-                        .filter(
-                          (n) =>
-                            n.length > 2 && !["Dr.", "Prof."].includes(n)
-                        )
-                        .map((n) => n[0])
-                        .slice(0, 2)
-                        .join("")}
+                      .split(" ")
+                      .filter(
+                        (n) =>
+                          n.length > 2 && !["Dr.", "Prof."].includes(n)
+                      )
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join("")}
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-text-primary">
@@ -232,11 +222,6 @@ export default function QuemSomosPage() {
               </div>
             ))}
           </div>
-
-          <p className="text-center text-text-muted text-sm mt-8 italic">
-            Os nomes da equipe são placeholders e devem ser substituídos pelos
-            nomes reais dos membros do Lasidra.
-          </p>
         </div>
       </section>
     </>
