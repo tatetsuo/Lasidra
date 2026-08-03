@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { ShieldAlert, ArrowDown } from "lucide-react";
 
 export default function HeroSection() {
@@ -73,20 +74,20 @@ export default function HeroSection() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up stagger-3">
-          <a
+          <Link
             href="/simulacoes"
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-secondary hover:bg-secondary-light text-primary-dark font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base hover:-translate-y-0.5"
             id="hero-cta-simulacoes"
           >
             Explorar Simulações
-          </a>
-          <a
+          </Link>
+          <Link
             href="/quem-somos"
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 transition-all duration-300 text-sm sm:text-base hover:-translate-y-0.5"
             id="hero-cta-about"
           >
             Conheça o Lasidra
-          </a>
+          </Link>
         </div>
 
         {/* Scroll indicator */}
