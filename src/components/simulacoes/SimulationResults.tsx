@@ -1,89 +1,80 @@
 "use client";
 
-import { X, Gauge, Waves, Clock, Map as MapIcon, ArrowUp } from "lucide-react";
-import { type Dam, statusColor } from "@/data/barragens";
+import { X, Gauge, Waves, CloudRain, ShieldAlert, ArrowUp, Info, Play, Image as ImageIcon } from "lucide-react";
 
 interface SimulationResultsProps {
-  dam: Dam;
+  sim: any;
   onClose: () => void;
 }
 
-const simulationCards = [
-  {
-    id: "velocidade",
-    title: "Velocidade",
-    icon: Gauge,
-    description:
-      "Velocidade do fluxo de água em m/s durante cenário de ruptura.",
-    color: "#DC2626",
-    bgColor: "rgba(220, 38, 38, 0.06)",
-  },
-  {
-    id: "profundidade",
-    title: "Profundidade",
-    icon: Waves,
-    description:
-      "Profundidade máxima da lâmina d'água em metros nas áreas atingidas.",
-    color: "#2563EB",
-    bgColor: "rgba(37, 99, 235, 0.06)",
-  },
-  {
-    id: "tempo-chegada",
-    title: "Tempo de Chegada",
-    icon: Clock,
-    description:
-      "Tempo estimado em minutos para a onda de cheia atingir cada ponto.",
-    color: "#EA580C",
-    bgColor: "rgba(234, 88, 12, 0.06)",
-  },
-  {
-    id: "mancha-inundacao",
-    title: "Mancha de Inundação",
-    icon: MapIcon,
-    description:
-      "Área total de inundação projetada com delimitação das zonas de autossalvamento.",
-    color: "#16A34A",
-    bgColor: "rgba(22, 163, 74, 0.06)",
-  },
-];
+function getYouTubeId(url: string) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
 
 export default function SimulationResults({
-  dam,
+  sim,
   onClose,
 }: SimulationResultsProps) {
+  const simulationCards = [
+    {
+      id: "ruptura",
+      title: "Ruptura / Drenagem",
+      icon: ShieldAlert,
+      value: sim.rupture_type,
+      color: "#DC2626",
+      bgColor: "rgba(220, 38, 38, 0.06)",
+    },
+    {
+      id: "chuva",
+      title: "Intensidade x Duração",
+      icon: CloudRain,
+      value: `${sim.rain_intensity} / ${sim.rain_duration}`,
+      color: "#2563EB",
+      bgColor: "rgba(37, 99, 235, 0.06)",
+    },
+    {
+      id: "volume",
+      title: "Volume da Chuva",
+      icon: Waves,
+      value: sim.rain_volume,
+      color: "#EA580C",
+      bgColor: "rgba(234, 88, 12, 0.06)",
+    },
+    {
+      id: "forca",
+      title: "Força de Chegada (Vel x Prof)",
+      icon: Gauge,
+      value: sim.arrival_force,
+      color: "#16A34A",
+      bgColor: "rgba(22, 163, 74, 0.06)",
+    },
+  ];
+
+  const youtubeId = sim.media_url ? getYouTubeId(sim.media_url) : null;
+  const isImage = sim.media_url ? sim.media_url.match(/\.(jpeg|jpg|gif|png)$/i) != null : false;
+
   return (
     <div className="animate-fade-in-up">
       {/* Header */}
       <div className="bg-white border border-border-light rounded-2xl shadow-md mb-6 overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-alert-red via-secondary to-alert-blue" />
+        <div className="h-1 bg-gradient-to-r from-purple-500 via-secondary to-purple-800" />
         <div className="px-6 py-5 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-lg shrink-0">
-              🏗️
+            <div className="w-12 h-12 rounded-xl bg-purple-600 flex items-center justify-center text-white font-bold text-lg shrink-0">
+              🔬
             </div>
             <div>
               <h3 className="text-lg sm:text-xl font-bold text-text-primary">
-                {dam.nome}
+                {sim.dam_name ? sim.dam_name : "Ponto de Simulação Customizado"}
               </h3>
               <div className="flex items-center gap-3 mt-1 flex-wrap">
                 <span className="text-xs text-text-muted">
-                  📍 {dam.municipio}
+                  📍 Coord: {sim.latitude.toFixed(4)}, {sim.longitude.toFixed(4)}
                 </span>
                 <span className="text-xs text-text-muted">
-                  🌊 {dam.rio}
-                </span>
-                <span
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold"
-                  style={{
-                    color: statusColor(dam.status),
-                    backgroundColor: `${statusColor(dam.status)}15`,
-                  }}
-                >
-                  <span
-                    className="w-1.5 h-1.5 rounded-full inline-block"
-                    style={{ background: statusColor(dam.status) }}
-                  />
-                  {dam.status}
+                  📅 Inserido em: {new Date(sim.created_at).toLocaleDateString('pt-BR')}
                 </span>
               </div>
             </div>
@@ -93,7 +84,6 @@ export default function SimulationResults({
             <button
               onClick={onClose}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-bg-secondary hover:bg-bg-tertiary text-text-secondary text-sm font-medium transition-all duration-200 border border-border-light"
-              id="simulation-back-btn"
             >
               <ArrowUp className="w-3.5 h-3.5" />
               Voltar ao Mapa
@@ -101,8 +91,6 @@ export default function SimulationResults({
             <button
               onClick={onClose}
               className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-alert-red/10 text-text-muted hover:text-alert-red transition-colors"
-              aria-label="Fechar simulações"
-              id="simulation-close-btn"
             >
               <X className="w-5 h-5" />
             </button>
@@ -110,92 +98,83 @@ export default function SimulationResults({
         </div>
       </div>
 
-      {/* Grid 2x2 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      {/* Grid 2x2 para Dados Principais */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
         {simulationCards.map((card, index) => (
           <div
             key={card.id}
-            className="bg-white rounded-xl border border-border-light shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
-            style={{
-              animationDelay: `${index * 100}ms`,
-            }}
-            id={`simulation-card-${card.id}`}
+            className="bg-white rounded-xl border border-border-light shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group flex"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
-            {/* Card color accent */}
-            <div
-              className="h-1"
-              style={{ background: card.color }}
-            />
-
-            {/* Placeholder image area */}
-            <div
-              className="aspect-[16/9] flex items-center justify-center relative overflow-hidden"
-              style={{ background: card.bgColor }}
-            >
-              {/* Grid pattern background */}
-              <svg
-                width="100%"
-                height="100%"
-                className="absolute inset-0 opacity-[0.08]"
-              >
-                <defs>
-                  <pattern
-                    id={`grid-${card.id}`}
-                    width="20"
-                    height="20"
-                    patternUnits="userSpaceOnUse"
-                  >
-                    <path
-                      d="M 20 0 L 0 0 0 20"
-                      fill="none"
-                      stroke={card.color}
-                      strokeWidth="0.5"
-                    />
-                  </pattern>
-                </defs>
-                <rect
-                  width="100%"
-                  height="100%"
-                  fill={`url(#grid-${card.id})`}
-                />
-              </svg>
-
-              {/* Icon + text */}
-              <div className="relative z-10 text-center px-4">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 transition-transform duration-300 group-hover:scale-110"
-                  style={{
-                    background: `${card.color}15`,
-                  }}
-                >
-                  <card.icon
-                    className="w-7 h-7"
-                    style={{ color: card.color }}
-                  />
-                </div>
-                <p
-                  className="text-sm font-semibold"
-                  style={{ color: card.color }}
-                >
-                  Simulação em desenvolvimento
-                </p>
-                <p className="text-xs text-text-muted mt-1">
-                  Dados serão adicionados pelo administrador
-                </p>
-              </div>
+            {/* Ícone */}
+            <div className="w-24 shrink-0 flex items-center justify-center" style={{ background: card.bgColor }}>
+               <card.icon className="w-8 h-8" style={{ color: card.color }} />
             </div>
-
-            {/* Card footer */}
-            <div className="px-5 py-4">
-              <h4 className="text-sm font-bold text-text-primary mb-1">
+            
+            {/* Texto */}
+            <div className="p-5 flex flex-col justify-center">
+              <p className="text-xs text-text-muted uppercase tracking-wider font-semibold mb-1">
                 {card.title}
-              </h4>
-              <p className="text-xs text-text-muted leading-relaxed">
-                {card.description}
               </p>
+              <h4 className="text-lg sm:text-xl font-bold text-gray-900 break-words">
+                {card.value}
+              </h4>
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Aba de Outros */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-full">
+          <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <Info className="w-5 h-5 text-secondary" />
+            Outras Informações / Observações
+          </h4>
+          <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+            {sim.others && sim.others.trim() !== "" ? sim.others : "Nenhuma observação adicional fornecida."}
+          </p>
+        </div>
+
+        {/* Media Player */}
+        {sim.media_url && (
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-full flex flex-col">
+            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
+              {youtubeId ? <Play className="w-5 h-5 text-red-600" /> : <ImageIcon className="w-5 h-5 text-purple-600" />}
+              Mídia Anexada
+            </h4>
+            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[200px]">
+              {youtubeId ? (
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${youtubeId}`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              ) : isImage ? (
+                <img
+                  src={sim.media_url}
+                  alt="Simulação"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="text-center p-4">
+                  <p className="text-sm text-gray-600 mb-2">Um link de arquivo foi anexado a esta simulação.</p>
+                  <a
+                    href={sim.media_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block px-4 py-2 bg-purple-100 text-purple-700 font-medium rounded-md hover:bg-purple-200"
+                  >
+                    Abrir Link Externo
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

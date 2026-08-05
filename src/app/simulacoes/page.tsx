@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { FlaskConical, Loader2 } from "lucide-react";
-import { type Dam } from "@/data/barragens";
 import SimulationResults from "@/components/simulacoes/SimulationResults";
 
 /* Importação dinâmica — Leaflet não funciona com SSR */
@@ -23,11 +22,11 @@ const SimulationMap = dynamic(
 );
 
 export default function SimulacoesPage() {
-  const [selectedDam, setSelectedDam] = useState<Dam | null>(null);
+  const [selectedSimulation, setSelectedSimulation] = useState<any | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const handleSelectDam = (dam: Dam) => {
-    setSelectedDam(dam);
+  const handleSelectSimulation = (sim: any) => {
+    setSelectedSimulation(sim);
     // Scroll to results after a brief delay for the animation
     setTimeout(() => {
       resultsRef.current?.scrollIntoView({
@@ -38,7 +37,7 @@ export default function SimulacoesPage() {
   };
 
   const handleClose = () => {
-    setSelectedDam(null);
+    setSelectedSimulation(null);
     // Scroll back to map
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -56,8 +55,7 @@ export default function SimulacoesPage() {
               Simulações
             </h1>
             <p className="text-white/50 text-xs sm:text-sm">
-              Clique em uma barragem no mapa para visualizar cenários de
-              simulação
+              Clique em um ponto de simulação no mapa para visualizar os resultados detalhados
             </p>
           </div>
         </div>
@@ -67,31 +65,31 @@ export default function SimulacoesPage() {
       <section className="bg-bg-secondary">
         <div
           className={`transition-all duration-500 ease-in-out ${
-            selectedDam ? "h-[40vh]" : "h-[70vh]"
+            selectedSimulation ? "h-[40vh]" : "h-[70vh]"
           }`}
         >
           <SimulationMap
-            onSelectDam={handleSelectDam}
-            selectedDamId={selectedDam?.id}
+            onSelectSimulation={handleSelectSimulation}
+            selectedSimulationId={selectedSimulation?.id}
           />
         </div>
       </section>
 
       {/* Simulation results */}
-      {selectedDam && (
+      {selectedSimulation && (
         <section
           ref={resultsRef}
           className="py-8 sm:py-10 bg-bg-secondary"
           id="simulation-results-section"
         >
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SimulationResults dam={selectedDam} onClose={handleClose} />
+            <SimulationResults sim={selectedSimulation} onClose={handleClose} />
           </div>
         </section>
       )}
 
-      {/* Empty state — when no dam selected */}
-      {!selectedDam && (
+      {/* Empty state — when no simulation selected */}
+      {!selectedSimulation && (
         <section className="py-10 bg-bg-secondary">
           <div className="max-w-2xl mx-auto px-4 text-center">
             <div className="bg-white rounded-xl border border-border-light shadow-sm p-8">
@@ -99,11 +97,11 @@ export default function SimulacoesPage() {
                 <FlaskConical className="w-7 h-7 text-primary" />
               </div>
               <h3 className="text-lg font-bold text-text-primary mb-2">
-                Selecione uma barragem
+                Selecione uma simulação
               </h3>
               <p className="text-text-muted text-sm leading-relaxed">
-                Clique em um dos pontos vermelhos no mapa acima para visualizar
-                os cenários de simulação disponíveis para cada barragem.
+                Clique em um dos pontos no mapa acima para visualizar
+                os cenários de simulação cadastrados pelo administrador.
               </p>
             </div>
           </div>

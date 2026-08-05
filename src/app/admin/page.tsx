@@ -1,110 +1,372 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { Lock, ArrowLeft, Construction, Database, Users, Settings } from "lucide-react";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Administração",
-  description: "Área administrativa do portal UFPI !AVISA! — acesso restrito.",
-  robots: { index: false, follow: false },
-};
+import { useEffect, useState } from "react";
+import { Lock, LogOut, MapPin, Activity, Pencil, Trash2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import dynamic from "next/dynamic";
 
-const futureFeatures = [
-  {
-    icon: Database,
-    title: "CRUD de Barragens",
-    description:
-      "Cadastrar, editar e remover barragens com coordenadas geográficas, dados técnicos e status.",
-  },
-  {
-    icon: Settings,
-    title: "Gerenciar Simulações",
-    description:
-      "Upload de dados de simulação, cenários de ruptura e resultados de modelos hidrológicos.",
-  },
-  {
-    icon: Users,
-    title: "Controle de Acesso",
-    description:
-      "Sistema de login com autenticação e níveis de permissão para administradores.",
-  },
-];
+const SimulationForm = dynamic(() => import("@/components/admin/SimulationForm"), {
+  ssr: false,
+});
 
 export default function AdminPage() {
-  return (
-    <>
-      {/* Page hero */}
-      <section className="bg-gradient-hero text-white py-16 sm:py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 mb-6">
-            <Lock className="w-8 h-8 text-secondary" />
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            Administração
-          </h1>
-          <p className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Área restrita para gerenciamento de dados do portal UFPI !AVISA!.
-          </p>
-        </div>
-      </section>
+  const [session, setSession] = useState<any>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  const [activeTab, setActiveTab] = useState<"relatos" | "simulacoes">("relatos");
+  
+  // Relatos State
+  const [reports, setReports] = useState<any[]>([]);
+  
+  // Simulações State
+  const [simulations, setSimulations] = useState<any[]>([]);
+  const [showSimForm, setShowSimForm] = useState(false);
+  const [editingSimulation, setEditingSimulation] = useState<any>(null);
 
-      {/* Under construction */}
-      <section className="py-16 sm:py-20 bg-bg-primary">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl border border-border-light shadow-lg overflow-hidden">
-            {/* Yellow accent bar */}
-            <div className="h-1.5 bg-gradient-to-r from-secondary via-secondary-light to-secondary" />
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
 
-            <div className="p-8 sm:p-12 text-center">
-              {/* Construction icon */}
-              <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-secondary-50 mb-6">
-                <Construction className="w-10 h-10 text-secondary" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full animate-pulse" />
-              </div>
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
-              <h2 className="text-2xl sm:text-3xl font-bold text-text-primary mb-3">
-                Painel Administrativo em Desenvolvimento
-              </h2>
-              <p className="text-text-secondary text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-8">
-                O sistema de administração está sendo desenvolvido para a
-                próxima fase do projeto. Este painel permitirá o gerenciamento
-                completo de barragens, simulações e dados do portal.
-              </p>
+    return () => subscription.unsubscribe();
+  }, []);
 
-              {/* Future features preview */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 text-left max-w-3xl mx-auto">
-                {futureFeatures.map((feature) => (
-                  <div
-                    key={feature.title}
-                    className="flex flex-col items-start gap-3 p-5 rounded-xl bg-bg-secondary border border-border-light"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center">
-                      <feature.icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-text-primary mb-1">
-                        {feature.title}
-                      </h3>
-                      <p className="text-xs text-text-muted leading-relaxed">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+  useEffect(() => {
+    if (session) {
+      fetchReports();
+      fetchSimulations();
+    }
+  }, [session]);
 
-              {/* Back button */}
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-light text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-sm hover:-translate-y-0.5 group"
-                id="admin-back-home"
-              >
-                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                Voltar à Página Inicial
-              </Link>
+  const fetchReports = async () => {
+    const { data, error } = await supabase.from("reports").select("*").order("created_at", { ascending: false });
+    if (!error && data) {
+      setReports(data);
+    }
+  };
+
+  const fetchSimulations = async () => {
+    const { data, error } = await supabase.from("simulations").select("*").order("created_at", { ascending: false });
+    if (!error && data) {
+      setSimulations(data);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) alert(error.message);
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const updateReportStatus = async (id: string, newStatus: string) => {
+    const { error } = await supabase.from("reports").update({ status: newStatus }).eq("id", id);
+    if (!error) {
+      fetchReports();
+    } else {
+      alert("Erro ao atualizar status");
+    }
+  };
+
+  const handleDeleteSimulation = async (id: string) => {
+    if (confirm("Tem certeza que deseja excluir esta simulação? Esta ação não pode ser desfeita.")) {
+      const { error } = await supabase.from("simulations").delete().eq("id", id);
+      if (!error) {
+        fetchSimulations();
+      } else {
+        alert("Erro ao excluir simulação: " + error.message);
+      }
+    }
+  };
+
+  const handleEditSimulation = (sim: any) => {
+    setEditingSimulation(sim);
+    setShowSimForm(true);
+  };
+
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="flex justify-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10">
+              <Lock className="w-8 h-8 text-primary" />
             </div>
           </div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Acesso Restrito
+          </h2>
         </div>
-      </section>
-    </>
+
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-200">
+            <form className="space-y-6" onSubmit={handleLogin}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <div className="mt-1">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Senha</label>
+                <div className="mt-1">
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+                >
+                  {loading ? "Entrando..." : "Entrar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-bg-primary">
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Painel de Administração</h1>
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none"
+          >
+            <LogOut className="w-4 h-4" /> Sair
+          </button>
+        </div>
+      </header>
+      
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {/* Navegação por Abas */}
+        <div className="mb-6 flex gap-4 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab("relatos")}
+            className={`pb-4 px-2 font-medium flex items-center gap-2 transition-colors ${
+              activeTab === "relatos"
+                ? "border-b-2 border-primary text-primary"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            <MapPin className="w-5 h-5" />
+            Relatos
+          </button>
+          <button
+            onClick={() => setActiveTab("simulacoes")}
+            className={`pb-4 px-2 font-medium flex items-center gap-2 transition-colors ${
+              activeTab === "simulacoes"
+                ? "border-b-2 border-primary text-primary"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            <Activity className="w-5 h-5" />
+            Simulações
+          </button>
+        </div>
+
+        {/* Tab de Relatos */}
+        {activeTab === "relatos" && (
+          <div className="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
+            <ul role="list" className="divide-y divide-gray-200">
+              {reports.map((report) => (
+                <li key={report.id} className="p-4 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-lg font-bold text-primary truncate">{report.title}</h4>
+                      <p className="text-sm text-gray-500 mt-1">Categoria: {report.category}</p>
+                      <p className="text-sm text-gray-700 mt-2">{report.description}</p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        Criado em: {new Date(report.created_at).toLocaleString('pt-BR')} | 
+                        Coord: {report.latitude.toFixed(4)}, {report.longitude.toFixed(4)}
+                      </p>
+                    </div>
+                    <div className="ml-4 flex-shrink-0 flex flex-col items-end gap-2">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          report.status === "resolvido"
+                            ? "bg-green-100 text-green-800"
+                            : report.status === "em andamento"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {report.status}
+                      </span>
+                      <div className="flex gap-2 mt-2">
+                        {report.status !== "pendente" && (
+                          <button
+                            onClick={() => updateReportStatus(report.id, "pendente")}
+                            className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded border"
+                          >
+                            Pendente
+                          </button>
+                        )}
+                        {report.status !== "em andamento" && (
+                          <button
+                            onClick={() => updateReportStatus(report.id, "em andamento")}
+                            className="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-2 py-1 rounded border"
+                          >
+                            Em Andamento
+                          </button>
+                        )}
+                        {report.status !== "resolvido" && (
+                          <button
+                            onClick={() => updateReportStatus(report.id, "resolvido")}
+                            className="text-xs bg-green-100 hover:bg-green-200 text-green-800 px-2 py-1 rounded border"
+                          >
+                            Resolvido
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              ))}
+              {reports.length === 0 && (
+                <li className="p-8 text-center text-gray-500">Nenhum relato encontrado.</li>
+              )}
+            </ul>
+          </div>
+        )}
+
+        {/* Tab de Simulações */}
+        {activeTab === "simulacoes" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-900">Gerenciar Simulações</h2>
+              {!showSimForm && (
+                <button
+                  onClick={() => {
+                    setEditingSimulation(null);
+                    setShowSimForm(true);
+                  }}
+                  className="px-4 py-2 bg-primary text-white font-medium rounded-md hover:bg-primary-light"
+                >
+                  + Nova Simulação
+                </button>
+              )}
+            </div>
+
+            {showSimForm ? (
+              <SimulationForm
+                initialData={editingSimulation}
+                onSuccess={() => {
+                  setShowSimForm(false);
+                  setEditingSimulation(null);
+                  fetchSimulations();
+                }}
+              />
+            ) : (
+              <div className="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
+                <ul role="list" className="divide-y divide-gray-200">
+                  {simulations.map((sim) => (
+                    <li key={sim.id} className="p-4 hover:bg-gray-50">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="text-lg font-bold text-primary">
+                              {sim.dam_name ? sim.dam_name : "Ponto Customizado"}
+                            </h4>
+                            <span className="text-xs text-gray-400">
+                              {new Date(sim.created_at).toLocaleString('pt-BR')}
+                            </span>
+                          </div>
+                          
+                          {/* Ações: Editar e Excluir */}
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleEditSimulation(sim)}
+                              className="inline-flex items-center justify-center p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                              title="Editar"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteSimulation(sim.id)}
+                              className="inline-flex items-center justify-center p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                              title="Excluir"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mt-2">
+                          <div>
+                            <strong className="block text-gray-500">Ruptura/Drenagem</strong>
+                            <span>{sim.rupture_type}</span>
+                          </div>
+                          <div>
+                            <strong className="block text-gray-500">Força de Chegada</strong>
+                            <span>{sim.arrival_force}</span>
+                          </div>
+                          <div>
+                            <strong className="block text-gray-500">Chuva (Intensidade/Duração)</strong>
+                            <span>{sim.rain_intensity} / {sim.rain_duration}</span>
+                          </div>
+                          <div>
+                            <strong className="block text-gray-500">Volume</strong>
+                            <span>{sim.rain_volume}</span>
+                          </div>
+                        </div>
+                        
+                        {sim.media_url && (
+                          <div className="mt-2 text-xs font-medium text-purple-600 flex items-center gap-1">
+                            📎 Contém Mídia Anexada
+                          </div>
+                        )}
+                        
+                        <p className="text-xs text-gray-400 mt-2">
+                          Coord: {sim.latitude.toFixed(4)}, {sim.longitude.toFixed(4)}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                  {simulations.length === 0 && (
+                    <li className="p-8 text-center text-gray-500">Nenhuma simulação cadastrada.</li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
