@@ -10,13 +10,13 @@ if (isGithubActions && process.env.GITHUB_REPOSITORY) {
 const nextConfig: NextConfig = {
   output: "export",
   basePath: repo,
-    eslint: {
+  eslint: {
     // Atenção: Isso permite que a publicação passe mesmo com erros de código
     ignoreDuringBuilds: true,
+  },
   images: {
     unoptimized: true,
   },
 };
-
 
 export default nextConfig;
