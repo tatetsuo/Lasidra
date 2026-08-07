@@ -122,10 +122,17 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
-            <p>
-              © {currentYear} Lasidra — Universidade Federal do Piauí. Todos os
-              direitos reservados.
-            </p>
+            <div className="flex flex-col gap-1">
+              <p>
+                © {currentYear} Lasidra — Universidade Federal do Piauí.
+              </p>
+              <div className="flex items-center gap-2 text-white/50 hover:text-white/80 transition-colors">
+                <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">
+                  <img alt="Licença Creative Commons" style={{ borderWidth:0, height: "15px" }} src="https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png" />
+                </a>
+                <span>Este obra está licenciado com uma Licença <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" className="underline">CC BY-NC-ND 4.0</a>.</span>
+              </div>
+            </div>
             {/* Botão de Direitos Autorais */}
             <Link
               href="/diretrizes"

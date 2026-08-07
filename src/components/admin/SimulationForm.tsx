@@ -30,10 +30,12 @@ const customIcon = new L.Icon({
 
 export default function SimulationForm({ 
   onSuccess, 
-  initialData 
+  initialData,
+  simType
 }: { 
   onSuccess: () => void;
   initialData?: any;
+  simType: "barragem" | "drenagem";
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,12 +45,20 @@ export default function SimulationForm({
   const [lat, setLat] = useState<number | "">("");
   const [lng, setLng] = useState<number | "">("");
   
+  // Barragem fields
   const [ruptureType, setRuptureType] = useState("Overtopping (Galgamento)");
   const [customRupture, setCustomRupture] = useState("");
+  const [waterReach, setWaterReach] = useState("");
+  const [waterVelocity, setWaterVelocity] = useState("");
+  const [waterDepth, setWaterDepth] = useState("");
+  const [arrivalForce, setArrivalForce] = useState("");
+
+  // Drenagem fields
   const [rainIntensity, setRainIntensity] = useState("");
   const [rainDuration, setRainDuration] = useState("");
   const [rainVolume, setRainVolume] = useState("");
-  const [arrivalForce, setArrivalForce] = useState("");
+  
+  // Shared fields
   const [others, setOthers] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
 
@@ -59,17 +69,24 @@ export default function SimulationForm({
       setSelectedDamId(initialData.dam_id || "");
       
       const commonRuptures = ["Overtopping (Galgamento)", "Piping (Piping interno)", "Falha Estrutural"];
-      if (commonRuptures.includes(initialData.rupture_type)) {
-        setRuptureType(initialData.rupture_type);
-      } else {
-        setRuptureType("Outro");
-        setCustomRupture(initialData.rupture_type);
+      if (initialData.rupture_type) {
+        if (commonRuptures.includes(initialData.rupture_type)) {
+          setRuptureType(initialData.rupture_type);
+        } else {
+          setRuptureType("Outro");
+          setCustomRupture(initialData.rupture_type);
+        }
       }
+
+      setWaterReach(initialData.water_reach || "");
+      setWaterVelocity(initialData.water_velocity || "");
+      setWaterDepth(initialData.water_depth || "");
+      setArrivalForce(initialData.arrival_force || "");
 
       setRainIntensity(initialData.rain_intensity || "");
       setRainDuration(initialData.rain_duration || "");
       setRainVolume(initialData.rain_volume || "");
-      setArrivalForce(initialData.arrival_force || "");
+
       setOthers(initialData.others || "");
       setMediaUrl(initialData.media_url || "");
     }
@@ -112,19 +129,39 @@ export default function SimulationForm({
       damName = barragens.find((b) => b.id.toString() === selectedDamId)?.nome || "";
     }
 
-    const payload = {
+    const payload: any = {
+      type: simType,
       latitude: lat,
       longitude: lng,
       dam_id: selectedDamId !== "" ? selectedDamId : null,
       dam_name: damName,
-      rupture_type: finalRuptureType,
-      rain_intensity: rainIntensity,
-      rain_duration: rainDuration,
-      rain_volume: rainVolume,
-      arrival_force: arrivalForce,
       others: others,
       media_url: mediaUrl,
     };
+
+    if (simType === "barragem") {
+      payload.rupture_type = finalRuptureType;
+      payload.water_reach = waterReach;
+      payload.water_velocity = waterVelocity;
+      payload.water_depth = waterDepth;
+      payload.arrival_force = arrivalForce;
+      
+      // Limpar campos de drenagem
+      payload.rain_intensity = null;
+      payload.rain_duration = null;
+      payload.rain_volume = null;
+    } else {
+      payload.rain_intensity = rainIntensity;
+      payload.rain_duration = rainDuration;
+      payload.rain_volume = rainVolume;
+
+      // Limpar campos de barragem
+      payload.rupture_type = null;
+      payload.water_reach = null;
+      payload.water_velocity = null;
+      payload.water_depth = null;
+      payload.arrival_force = null;
+    }
 
     let dbError;
     
@@ -154,8 +191,11 @@ export default function SimulationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm animate-fade-in-up">
-      <h3 className="text-xl font-bold text-gray-900 border-b pb-2">
-        {initialData ? "✏️ Editar Simulação" : "Nova Simulação"}
+      <h3 className="text-xl font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
+        {simType === "barragem" ? "🚧 " : "🌧️ "}
+        {initialData 
+          ? \`Editar Simulação de \${simType === 'barragem' ? 'Barragem' : 'Drenagem'}\` 
+          : \`Nova Simulação de \${simType === 'barragem' ? 'Barragem' : 'Drenagem'}\`}
       </h3>
       
       {error && <div className="p-3 bg-red-100 text-red-800 rounded-md text-sm">{error}</div>}
@@ -165,7 +205,7 @@ export default function SimulationForm({
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-700">1. Localização</h4>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Barragem Existente (Opcional)</label>
+            <label className="block text-sm font-medium text-gray-700">Ponto Existente (Opcional)</label>
             <select
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm p-2 border"
               value={selectedDamId}
@@ -215,49 +255,73 @@ export default function SimulationForm({
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-700">2. Parâmetros da Simulação</h4>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Tipo de Ruptura / Drenagem</label>
-            <select
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm"
-              value={ruptureType}
-              onChange={(e) => setRuptureType(e.target.value)}
-            >
-              <option value="Overtopping (Galgamento)">Overtopping (Galgamento)</option>
-              <option value="Piping (Piping interno)">Piping (Piping interno)</option>
-              <option value="Falha Estrutural">Falha Estrutural</option>
-              <option value="Outro">Outro...</option>
-            </select>
-          </div>
-          
-          {ruptureType === "Outro" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Especifique o Tipo</label>
-              <input type="text" required value={customRupture} onChange={(e) => setCustomRupture(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
-            </div>
+          {simType === "barragem" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Tipo de Ruptura</label>
+                <select
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm"
+                  value={ruptureType}
+                  onChange={(e) => setRuptureType(e.target.value)}
+                >
+                  <option value="Overtopping (Galgamento)">Overtopping (Galgamento)</option>
+                  <option value="Piping (Piping interno)">Piping (Piping interno)</option>
+                  <option value="Falha Estrutural">Falha Estrutural</option>
+                  <option value="Outro">Outro...</option>
+                </select>
+              </div>
+              
+              {ruptureType === "Outro" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Especifique o Tipo</label>
+                  <input type="text" required value={customRupture} onChange={(e) => setCustomRupture(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Máximo alcance da Lâmina d'água</label>
+                <input type="text" required value={waterReach} onChange={(e) => setWaterReach(e.target.value)} placeholder="Ex: 5 km" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Velocidade da água</label>
+                  <input type="text" required value={waterVelocity} onChange={(e) => setWaterVelocity(e.target.value)} placeholder="Ex: 2 m/s" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Profundidade da água</label>
+                  <input type="text" required value={waterDepth} onChange={(e) => setWaterDepth(e.target.value)} placeholder="Ex: 1.5 m" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Velocidade x Profundidade (Força de Chegada)</label>
+                <input type="text" required value={arrivalForce} onChange={(e) => setArrivalForce(e.target.value)} placeholder="Ex: 3 m²/s" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
+              </div>
+            </>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Intensidade de Chuva (mm/h)</label>
-              <input type="text" required value={rainIntensity} onChange={(e) => setRainIntensity(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Duração da Chuva (horas)</label>
-              <input type="text" required value={rainDuration} onChange={(e) => setRainDuration(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
-            </div>
-          </div>
+          {simType === "drenagem" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Volume da Chuva (mm)</label>
+                <input type="text" required value={rainVolume} onChange={(e) => setRainVolume(e.target.value)} placeholder="Ex: 120 mm" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Volume da Chuva (mm ou m³)</label>
-            <input type="text" required value={rainVolume} onChange={(e) => setRainVolume(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
-          </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Intensidade (mm/h)</label>
+                  <input type="text" required value={rainIntensity} onChange={(e) => setRainIntensity(e.target.value)} placeholder="Ex: 30 mm/h" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Duração (hs)</label>
+                  <input type="text" required value={rainDuration} onChange={(e) => setRainDuration(e.target.value)} placeholder="Ex: 4 hs" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
+                </div>
+              </div>
+            </>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Força de Chegada (Velocidade x Profundidade)</label>
-            <input type="text" required value={arrivalForce} onChange={(e) => setArrivalForce(e.target.value)} placeholder="Ex: 5.2 m²/s" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
-          </div>
-
-          <div>
+          <div className="pt-4 border-t">
             <label className="block text-sm font-medium text-gray-700">URL da Mídia (YouTube, Google Drive, Imgur)</label>
             <input type="url" value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm text-purple-700 font-medium" />
             <p className="text-xs text-gray-500 mt-1">Insira um link para incorporar um vídeo ou foto à simulação.</p>

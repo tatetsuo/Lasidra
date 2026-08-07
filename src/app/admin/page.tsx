@@ -24,6 +24,7 @@ export default function AdminPage() {
   const [simulations, setSimulations] = useState<any[]>([]);
   const [showSimForm, setShowSimForm] = useState(false);
   const [editingSimulation, setEditingSimulation] = useState<any>(null);
+  const [formSimType, setFormSimType] = useState<"barragem" | "drenagem">("barragem");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -97,6 +98,7 @@ export default function AdminPage() {
 
   const handleEditSimulation = (sim: any) => {
     setEditingSimulation(sim);
+    setFormSimType(sim.type || "barragem");
     setShowSimForm(true);
   };
 
@@ -271,20 +273,34 @@ export default function AdminPage() {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-gray-900">Gerenciar Simulações</h2>
               {!showSimForm && (
-                <button
-                  onClick={() => {
-                    setEditingSimulation(null);
-                    setShowSimForm(true);
-                  }}
-                  className="px-4 py-2 bg-primary text-white font-medium rounded-md hover:bg-primary-light"
-                >
-                  + Nova Simulação
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setEditingSimulation(null);
+                      setFormSimType("barragem");
+                      setShowSimForm(true);
+                    }}
+                    className="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700"
+                  >
+                    + Simulação de Barragem
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingSimulation(null);
+                      setFormSimType("drenagem");
+                      setShowSimForm(true);
+                    }}
+                    className="px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600"
+                  >
+                    + Simulação de Drenagem
+                  </button>
+                </div>
               )}
             </div>
 
             {showSimForm ? (
               <SimulationForm
+                simType={formSimType}
                 initialData={editingSimulation}
                 onSuccess={() => {
                   setShowSimForm(false);
@@ -300,9 +316,14 @@ export default function AdminPage() {
                       <div className="flex flex-col gap-2">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="text-lg font-bold text-primary">
-                              {sim.dam_name ? sim.dam_name : "Ponto Customizado"}
-                            </h4>
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-lg font-bold text-primary">
+                                {sim.dam_name ? sim.dam_name : "Ponto Customizado"}
+                              </h4>
+                              <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${sim.type === 'drenagem' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+                                {sim.type === 'drenagem' ? 'Drenagem' : 'Barragem'}
+                              </span>
+                            </div>
                             <span className="text-xs text-gray-400">
                               {new Date(sim.created_at).toLocaleString('pt-BR')}
                             </span>
@@ -328,22 +349,37 @@ export default function AdminPage() {
                         </div>
                         
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mt-2">
-                          <div>
-                            <strong className="block text-gray-500">Ruptura/Drenagem</strong>
-                            <span>{sim.rupture_type}</span>
-                          </div>
-                          <div>
-                            <strong className="block text-gray-500">Força de Chegada</strong>
-                            <span>{sim.arrival_force}</span>
-                          </div>
-                          <div>
-                            <strong className="block text-gray-500">Chuva (Intensidade/Duração)</strong>
-                            <span>{sim.rain_intensity} / {sim.rain_duration}</span>
-                          </div>
-                          <div>
-                            <strong className="block text-gray-500">Volume</strong>
-                            <span>{sim.rain_volume}</span>
-                          </div>
+                          {sim.type === 'barragem' || !sim.type ? (
+                            <>
+                              <div>
+                                <strong className="block text-gray-500">Ruptura/Drenagem</strong>
+                                <span>{sim.rupture_type}</span>
+                              </div>
+                              <div>
+                                <strong className="block text-gray-500">Alcance d'água</strong>
+                                <span>{sim.water_reach}</span>
+                              </div>
+                              <div>
+                                <strong className="block text-gray-500">Força de Chegada</strong>
+                                <span>{sim.arrival_force}</span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div>
+                                <strong className="block text-gray-500">Volume (mm)</strong>
+                                <span>{sim.rain_volume}</span>
+                              </div>
+                              <div>
+                                <strong className="block text-gray-500">Intensidade (mm/h)</strong>
+                                <span>{sim.rain_intensity}</span>
+                              </div>
+                              <div>
+                                <strong className="block text-gray-500">Duração (hs)</strong>
+                                <span>{sim.rain_duration}</span>
+                              </div>
+                            </>
+                          )}
                         </div>
                         
                         {sim.media_url && (
