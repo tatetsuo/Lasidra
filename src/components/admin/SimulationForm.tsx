@@ -194,8 +194,8 @@ export default function SimulationForm({
       <h3 className="text-xl font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
         {simType === "barragem" ? "🚧 " : "🌧️ "}
         {initialData 
-          ? \`Editar Simulação de \${simType === 'barragem' ? 'Barragem' : 'Drenagem'}\` 
-          : \`Nova Simulação de \${simType === 'barragem' ? 'Barragem' : 'Drenagem'}\`}
+          ? `Editar Simulação de ${simType === 'barragem' ? 'Barragem' : 'Drenagem'}` 
+          : `Nova Simulação de ${simType === 'barragem' ? 'Barragem' : 'Drenagem'}`}
       </h3>
       
       {error && <div className="p-3 bg-red-100 text-red-800 rounded-md text-sm">{error}</div>}
