@@ -147,20 +147,20 @@ export default function SimulationForm({
       payload.arrival_force = arrivalForce;
       
       // Limpar campos de drenagem
-      payload.rain_intensity = null;
-      payload.rain_duration = null;
-      payload.rain_volume = null;
+      payload.rain_intensity = "";
+      payload.rain_duration = "";
+      payload.rain_volume = "";
     } else {
       payload.rain_intensity = rainIntensity;
       payload.rain_duration = rainDuration;
       payload.rain_volume = rainVolume;
 
       // Limpar campos de barragem
-      payload.rupture_type = null;
-      payload.water_reach = null;
-      payload.water_velocity = null;
-      payload.water_depth = null;
-      payload.arrival_force = null;
+      payload.rupture_type = "";
+      payload.water_reach = "";
+      payload.water_velocity = "";
+      payload.water_depth = "";
+      payload.arrival_force = "";
     }
 
     let dbError;
