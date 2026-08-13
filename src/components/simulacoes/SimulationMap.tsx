@@ -70,14 +70,28 @@ export default function SimulationMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {simulations.map((sim) => {
-        const isDrenagem = sim.type === 'drenagem';
-        const icon = isDrenagem ? yellowIcon : redIcon;
-        const mainColor = isDrenagem ? "#EAB308" : "#DC2626";
-        const hoverColor = isDrenagem ? "#CA8A04" : "#B91C1C";
+      {Object.values(
+        simulations.reduce((acc, sim) => {
+          const key = `${sim.latitude},${sim.longitude}`;
+          if (!acc[key]) {
+            acc[key] = [];
+          }
+          acc[key].push(sim);
+          return acc;
+        }, {} as Record<string, any[]>)
+      ).map((group: any) => {
+        const firstSim = group[0];
+        const hasDrenagem = group.some((s: any) => s.type === 'drenagem');
+        const hasBarragem = group.some((s: any) => s.type === 'barragem');
+        
+        const mainIcon = hasDrenagem && !hasBarragem ? yellowIcon : redIcon;
+        const mainColor = hasDrenagem && !hasBarragem ? "#EAB308" : "#DC2626";
+        const hoverColor = hasDrenagem && !hasBarragem ? "#CA8A04" : "#B91C1C";
+        
+        const isSelected = group.some((s: any) => s.id === selectedSimulationId);
 
         return (
-          <Marker key={sim.id} position={[sim.latitude, sim.longitude]} icon={icon}>
+          <Marker key={firstSim.id} position={[firstSim.latitude, firstSim.longitude]} icon={mainIcon}>
             <Popup>
               <div
                 style={{
@@ -86,7 +100,7 @@ export default function SimulationMap({
                   padding: "4px 0",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", flexWrap: "wrap" }}>
                   <h3
                     style={{
                       margin: "0",
@@ -96,44 +110,51 @@ export default function SimulationMap({
                       lineHeight: 1.3,
                     }}
                   >
-                    {sim.dam_name ? sim.dam_name : "Ponto Customizado"}
+                    {firstSim.dam_name ? firstSim.dam_name : "Ponto Customizado"}
                   </h3>
-                  <span style={{ 
-                    background: isDrenagem ? "#FEF9C3" : "#FEE2E2", 
-                    color: isDrenagem ? "#854D0E" : "#991B1B", 
-                    padding: "2px 6px", 
-                    borderRadius: "9999px", 
-                    fontSize: "10px", 
-                    fontWeight: "bold" 
-                  }}>
-                    {isDrenagem ? "Drenagem" : "Barragem"}
-                  </span>
+                  {hasDrenagem && (
+                    <span style={{ 
+                      background: "#FEF9C3", 
+                      color: "#854D0E", 
+                      padding: "2px 6px", 
+                      borderRadius: "9999px", 
+                      fontSize: "10px", 
+                      fontWeight: "bold" 
+                    }}>
+                      Drenagem
+                    </span>
+                  )}
+                  {hasBarragem && (
+                    <span style={{ 
+                      background: "#FEE2E2", 
+                      color: "#991B1B", 
+                      padding: "2px 6px", 
+                      borderRadius: "9999px", 
+                      fontSize: "10px", 
+                      fontWeight: "bold" 
+                    }}>
+                      Barragem
+                    </span>
+                  )}
                 </div>
 
                 <div style={{ marginBottom: 10 }}>
                   <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span>📍</span> Coord: {sim.latitude.toFixed(4)}, {sim.longitude.toFixed(4)}
+                    <span>📍</span> Coord: {firstSim.latitude.toFixed(4)}, {firstSim.longitude.toFixed(4)}
                   </p>
-                  {!isDrenagem && sim.rupture_type && (
-                    <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span>🌊</span> Ruptura: {sim.rupture_type}
-                    </p>
-                  )}
-                  {isDrenagem && sim.rain_volume && (
-                    <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span>🌧️</span> Volume: {sim.rain_volume}
-                    </p>
-                  )}
+                  <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>📊</span> Simulações: {group.length} cenário(s)
+                  </p>
                 </div>
 
                 <div style={{ height: 1, background: "#E5E7EB", margin: "0 0 10px 0" }} />
 
                 <button
-                  onClick={() => onSelectSimulation(sim)}
+                  onClick={() => onSelectSimulation(group)}
                   style={{
                     width: "100%",
                     padding: "8px 16px",
-                    background: selectedSimulationId === sim.id ? hoverColor : mainColor,
+                    background: isSelected ? hoverColor : mainColor,
                     color: "#FFFFFF",
                     border: "none",
                     borderRadius: "8px",
@@ -148,7 +169,7 @@ export default function SimulationMap({
                     boxShadow: `0 2px 6px ${mainColor}40`,
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = hoverColor)}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = selectedSimulationId === sim.id ? hoverColor : mainColor)}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = isSelected ? hoverColor : mainColor)}
                 >
                   🔬 Ver Resultados
                 </button>

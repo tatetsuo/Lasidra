@@ -22,11 +22,11 @@ const SimulationMap = dynamic(
 );
 
 export default function SimulacoesPage() {
-  const [selectedSimulation, setSelectedSimulation] = useState<any | null>(null);
+  const [selectedSimulationGroup, setSelectedSimulationGroup] = useState<any[] | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const handleSelectSimulation = (sim: any) => {
-    setSelectedSimulation(sim);
+  const handleSelectSimulation = (group: any[]) => {
+    setSelectedSimulationGroup(group);
     // Scroll to results after a brief delay for the animation
     setTimeout(() => {
       resultsRef.current?.scrollIntoView({
@@ -37,7 +37,7 @@ export default function SimulacoesPage() {
   };
 
   const handleClose = () => {
-    setSelectedSimulation(null);
+    setSelectedSimulationGroup(null);
     // Scroll back to map
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -70,26 +70,26 @@ export default function SimulacoesPage() {
         >
           <SimulationMap
             onSelectSimulation={handleSelectSimulation}
-            selectedSimulationId={selectedSimulation?.id}
+            selectedSimulationId={selectedSimulationGroup?.[0]?.id}
           />
         </div>
       </section>
 
       {/* Simulation results */}
-      {selectedSimulation && (
+      {selectedSimulationGroup && (
         <section
           ref={resultsRef}
           className="py-8 sm:py-10 bg-bg-secondary"
           id="simulation-results-section"
         >
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SimulationResults sim={selectedSimulation} onClose={handleClose} />
+            <SimulationResults group={selectedSimulationGroup} onClose={handleClose} />
           </div>
         </section>
       )}
 
       {/* Empty state — when no simulation selected */}
-      {!selectedSimulation && (
+      {!selectedSimulationGroup && (
         <section className="py-10 bg-bg-secondary">
           <div className="max-w-2xl mx-auto px-4 text-center">
             <div className="bg-white rounded-xl border border-border-light shadow-sm p-8">

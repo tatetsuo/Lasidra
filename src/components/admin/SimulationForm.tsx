@@ -57,6 +57,7 @@ export default function SimulationForm({
   const [rainIntensity, setRainIntensity] = useState("");
   const [rainDuration, setRainDuration] = useState("");
   const [rainVolume, setRainVolume] = useState("");
+  const [returnPeriodTag, setReturnPeriodTag] = useState("");
   
   // Shared fields
   const [others, setOthers] = useState("");
@@ -86,6 +87,7 @@ export default function SimulationForm({
       setRainIntensity(initialData.rain_intensity || "");
       setRainDuration(initialData.rain_duration || "");
       setRainVolume(initialData.rain_volume || "");
+      setReturnPeriodTag(initialData.return_period_tag || "");
 
       setOthers(initialData.others || "");
       setMediaUrl(initialData.media_url || "");
@@ -150,10 +152,12 @@ export default function SimulationForm({
       payload.rain_intensity = "";
       payload.rain_duration = "";
       payload.rain_volume = "";
+      payload.return_period_tag = "";
     } else {
       payload.rain_intensity = rainIntensity;
       payload.rain_duration = rainDuration;
       payload.rain_volume = rainVolume;
+      payload.return_period_tag = returnPeriodTag;
 
       // Limpar campos de barragem
       payload.rupture_type = "";
@@ -317,6 +321,24 @@ export default function SimulationForm({
                   <label className="block text-sm font-medium text-gray-700">Duração (hs)</label>
                   <input type="text" required value={rainDuration} onChange={(e) => setRainDuration(e.target.value)} placeholder="Ex: 4 hs" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Categoria (Anos de Retorno)</label>
+                <select
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm"
+                  value={returnPeriodTag}
+                  onChange={(e) => setReturnPeriodTag(e.target.value)}
+                >
+                  <option value="">-- Selecione uma Categoria --</option>
+                  <option value="Muito frequente (até 10 anos de retorno)">Muito frequente (até 10 anos de retorno)</option>
+                  <option value="Frequente (entre 10 e 50 anos de retorno)">Frequente (entre 10 e 50 anos de retorno)</option>
+                  <option value="Raro (entre 50 a 100 anos de retorno)">Raro (entre 50 a 100 anos de retorno)</option>
+                  <option value="Muito raro (entre 100 a 500 anos de retorno)">Muito raro (entre 100 a 500 anos de retorno)</option>
+                  <option value="Raríssimo (entre 500 a 1000 anos de retorno)">Raríssimo (entre 500 a 1000 anos de retorno)</option>
+                  <option value="Absurdo (mais de 1000 anos de retorno)">Absurdo (mais de 1000 anos de retorno)</option>
+                </select>
               </div>
             </>
           )}

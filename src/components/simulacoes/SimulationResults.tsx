@@ -1,9 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { X, Gauge, Waves, CloudRain, ShieldAlert, ArrowUp, Info, Play, Image as ImageIcon, MapPin, Target } from "lucide-react";
 
 interface SimulationResultsProps {
-  sim: any;
+  group: any[];
   onClose: () => void;
 }
 
@@ -14,10 +15,35 @@ function getYouTubeId(url: string) {
 }
 
 export default function SimulationResults({
-  sim,
+  group,
   onClose,
 }: SimulationResultsProps) {
-  const isDrenagem = sim.type === 'drenagem';
+  const isDrenagem = group && group.length > 0 && group[0].type === 'drenagem';
+
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => {
+    return isDrenagem ? group[0].return_period_tag || "Geral" : "Geral";
+  });
+
+  const simsInCategory = isDrenagem 
+    ? group.filter(s => (s.return_period_tag || "Geral") === selectedCategory)
+    : group;
+
+  const [selectedSimId, setSelectedSimId] = useState<string>(() => {
+    return simsInCategory[0]?.id;
+  });
+
+  useEffect(() => {
+    if (simsInCategory.length > 0 && !simsInCategory.find(s => s.id === selectedSimId)) {
+      setSelectedSimId(simsInCategory[0].id);
+    }
+  }, [selectedCategory, simsInCategory]);
+
+  const sim = group.find(s => s.id === selectedSimId) || group[0];
+
+  const uniqueCategories = isDrenagem
+    ? Array.from(new Set(group.map(s => s.return_period_tag || "Geral")))
+    : [];
+
 
   const barragemCards = [
     {
@@ -104,6 +130,11 @@ export default function SimulationResults({
                 <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isDrenagem ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
                   {isDrenagem ? 'Drenagem' : 'Barragem'}
                 </span>
+                {isDrenagem && sim.return_period_tag && (
+                  <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
+                    {sim.return_period_tag}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-3 mt-1 flex-wrap">
                 <span className="text-xs text-text-muted flex items-center gap-1">
@@ -133,6 +164,52 @@ export default function SimulationResults({
           </div>
         </div>
       </div>
+
+      {isDrenagem && uniqueCategories.length > 0 && (
+        <div className="mb-6 p-5 bg-white border border-border-light rounded-2xl shadow-sm">
+          <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3">
+            1. Escolha a Categoria de Retorno
+          </h4>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {uniqueCategories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  selectedCategory === cat 
+                    ? 'bg-yellow-500 text-white shadow-md' 
+                    : 'bg-bg-secondary border border-border-light text-text-secondary hover:bg-bg-tertiary'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          
+          {simsInCategory.length > 1 && (
+            <>
+              <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3 mt-5 border-t border-border-light pt-5">
+                2. Filtre por Duração e Intensidade
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {simsInCategory.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => setSelectedSimId(s.id)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      selectedSimId === s.id 
+                        ? 'bg-blue-600 text-white shadow-md' 
+                        : 'bg-bg-secondary border border-border-light text-text-secondary hover:bg-bg-tertiary'
+                    }`}
+                  >
+                    ⏱️ {s.rain_duration} | 🌧️ {s.rain_intensity}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Grid para Dados Principais */}
       <div className={`grid grid-cols-1 sm:grid-cols-2 ${!isDrenagem ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-5 mb-6`}>
