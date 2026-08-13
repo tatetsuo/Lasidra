@@ -65,7 +65,7 @@ export default function SimulacoesPage() {
       <section className="bg-bg-secondary">
         <div
           className={`transition-all duration-500 ease-in-out ${
-            selectedSimulation ? "h-[40vh]" : "h-[70vh]"
+            selectedSimulationGroup ? "h-[40vh]" : "h-[70vh]"
           }`}
         >
           <SimulationMap
