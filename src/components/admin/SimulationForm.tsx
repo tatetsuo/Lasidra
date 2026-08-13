@@ -62,6 +62,26 @@ export default function SimulationForm({
   // Shared fields
   const [others, setOthers] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
+  const [customPointName, setCustomPointName] = useState("");
+  const [customPoints, setCustomPoints] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCustomPoints = async () => {
+      const { data } = await supabase
+        .from("simulations")
+        .select("dam_name, latitude, longitude")
+        .is("dam_id", null);
+      if (data) {
+        const unique = Array.from(new Set(data.filter(d => d.dam_name).map(d => JSON.stringify({
+          dam_name: d.dam_name,
+          latitude: d.latitude,
+          longitude: d.longitude
+        })))).map(s => JSON.parse(s as string));
+        setCustomPoints(unique);
+      }
+    };
+    fetchCustomPoints();
+  }, []);
 
   useEffect(() => {
     if (initialData) {
@@ -97,20 +117,28 @@ export default function SimulationForm({
   const handleDamChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setSelectedDamId(val);
-    if (val !== "") {
+    if (val.startsWith("custom_")) {
+      const parts = val.split("_");
+      setLat(parseFloat(parts[1]));
+      setLng(parseFloat(parts[2]));
+      setCustomPointName(parts.slice(3).join("_"));
+    } else if (val !== "") {
       const dam = barragens.find((b) => b.id.toString() === val);
       if (dam) {
         setLat(dam.lat);
         setLng(dam.lng);
+        setCustomPointName("");
       }
     } else {
       setLat("");
       setLng("");
+      setCustomPointName("");
     }
   };
 
   const handleMapClick = (mapLat: number, mapLng: number) => {
     setSelectedDamId(""); // Custom point
+    setCustomPointName("");
     setLat(mapLat);
     setLng(mapLng);
   };
@@ -126,17 +154,29 @@ export default function SimulationForm({
     setError(null);
 
     const finalRuptureType = ruptureType === "Outro" ? customRupture : ruptureType;
-    let damName = "";
-    if (selectedDamId !== "") {
-      damName = barragens.find((b) => b.id.toString() === selectedDamId)?.nome || "";
+    let finalDamName = "";
+    let finalDamId = null;
+    
+    if (selectedDamId !== "" && !selectedDamId.startsWith("custom_")) {
+      finalDamName = barragens.find((b) => b.id.toString() === selectedDamId)?.nome || "";
+      finalDamId = selectedDamId;
+    } else {
+      finalDamName = customPointName;
+      finalDamId = null;
+    }
+
+    if (!finalDamName && finalDamId === null) {
+      setError("Por favor, digite um nome para o Ponto Personalizado.");
+      setLoading(false);
+      return;
     }
 
     const payload: any = {
       type: simType,
       latitude: lat,
       longitude: lng,
-      dam_id: selectedDamId !== "" ? selectedDamId : null,
-      dam_name: damName,
+      dam_id: finalDamId,
+      dam_name: finalDamName,
       others: others,
       media_url: mediaUrl,
     };
@@ -215,14 +255,39 @@ export default function SimulationForm({
               value={selectedDamId}
               onChange={handleDamChange}
             >
-              <option value="">-- Ponto Customizado (Clique no Mapa) --</option>
-              {barragens.map((dam) => (
-                <option key={dam.id} value={dam.id}>
-                  {dam.nome} ({dam.municipio})
-                </option>
-              ))}
+              <option value="">-- Ponto Customizado (Novo - Clique no Mapa) --</option>
+              <optgroup label="Barragens Cadastradas">
+                {barragens.map((dam) => (
+                  <option key={dam.id} value={dam.id}>
+                    {dam.nome} ({dam.municipio})
+                  </option>
+                ))}
+              </optgroup>
+              {customPoints.length > 0 && (
+                <optgroup label="Pontos Personalizados (Anteriores)">
+                  {customPoints.map((pt, idx) => (
+                    <option key={`custom-${idx}`} value={`custom_${pt.latitude}_${pt.longitude}_${pt.dam_name}`}>
+                      {pt.dam_name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </div>
+
+          {(selectedDamId === "" || selectedDamId.startsWith("custom_")) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Nome do Ponto Personalizado</label>
+              <input 
+                type="text" 
+                required 
+                value={customPointName} 
+                onChange={(e) => setCustomPointName(e.target.value)} 
+                placeholder="Ex: Rio Parnaíba (Trecho Centro)" 
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm" 
+              />
+            </div>
+          )}
           
           <div className="text-sm text-gray-500">
             Ou clique no mapa para escolher uma coordenada específica:
