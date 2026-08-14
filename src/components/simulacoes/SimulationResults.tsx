@@ -268,13 +268,6 @@ export default function SimulationResults({
                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-gray-900"></span>
                          </span>
                        </span>
-  };
-
-  const youtubeId = sim?.video_url ? getYouTubeId(sim.video_url) : (sim?.media_url && getYouTubeId(sim.media_url) ? getYouTubeId(sim.media_url) : null);
-  const rawImageUrls = sim?.image_urls || [];
-  const legacyMedia = sim?.media_url && !getYouTubeId(sim.media_url) ? [sim.media_url] : [];
-  const finalImageUrls = rawImageUrls.length > 0 ? rawImageUrls : legacyMedia;
-  const isImage = finalImageUrls.length > 0;
                      )}
                    </p>
                 </div>
