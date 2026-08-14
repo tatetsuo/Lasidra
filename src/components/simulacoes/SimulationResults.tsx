@@ -111,24 +111,6 @@ export default function SimulationResults({
   ];
 
   const getDrenagemCards = (simulation: any) => [
-    {
-      id: "volume",
-      title: "Volume da Chuva",
-      tooltip: "Quantidade total de chuva (precipitação) esperada para o evento, medida em milímetros (mm).",
-      icon: Waves,
-      value: simulation?.rain_volume,
-      color: "#EA580C",
-      bgColor: "rgba(234, 88, 12, 0.06)",
-    },
-    {
-      id: "intensidade",
-      title: "Intensidade da Chuva",
-      tooltip: "Força da chuva no tempo (mm/h). Chuvas muito intensas em curtos períodos causam enxurradas graves.",
-      icon: CloudRain,
-      value: simulation?.rain_intensity,
-      color: "#2563EB",
-      bgColor: "rgba(37, 99, 235, 0.06)",
-    },
     { id: "volume", title: "Volume da Chuva", tooltip: "Quantidade total de chuva (precipitação) esperada para o evento, medida em milímetros (mm).", icon: Waves, value: simulation?.rain_volume, color: "#EA580C", bgColor: "rgba(234, 88, 12, 0.06)" },
     { id: "intensidade", title: "Intensidade da Chuva", tooltip: "Força da chuva no tempo (mm/h). Chuvas muito intensas em curtos períodos causam enxurradas graves.", icon: CloudRain, value: simulation?.rain_intensity, color: "#2563EB", bgColor: "rgba(37, 99, 235, 0.06)" },
     { id: "duracao", title: "Duração da Chuva", tooltip: "Tempo total em que a chuva persiste no cenário modelado.", icon: Gauge, value: simulation?.rain_duration, color: "#8B5CF6", bgColor: "rgba(139, 92, 246, 0.06)" },
