@@ -129,121 +129,29 @@ export default function SimulationResults({
       color: "#2563EB",
       bgColor: "rgba(37, 99, 235, 0.06)",
     },
-    {
-      id: "duracao",
-      title: "Duração da Chuva",
-      tooltip: "Tempo total em que a chuva persiste no cenário modelado.",
-      icon: Gauge,
-      value: simulation?.rain_duration,
-      color: "#8B5CF6",
-      bgColor: "rgba(139, 92, 246, 0.06)",
-    },
+    { id: "volume", title: "Volume da Chuva", tooltip: "Quantidade total de chuva (precipitação) esperada para o evento, medida em milímetros (mm).", icon: Waves, value: simulation?.rain_volume, color: "#EA580C", bgColor: "rgba(234, 88, 12, 0.06)" },
+    { id: "intensidade", title: "Intensidade da Chuva", tooltip: "Força da chuva no tempo (mm/h). Chuvas muito intensas em curtos períodos causam enxurradas graves.", icon: CloudRain, value: simulation?.rain_intensity, color: "#2563EB", bgColor: "rgba(37, 99, 235, 0.06)" },
+    { id: "duracao", title: "Duração da Chuva", tooltip: "Tempo total em que a chuva persiste no cenário modelado.", icon: Gauge, value: simulation?.rain_duration, color: "#8B5CF6", bgColor: "rgba(139, 92, 246, 0.06)" },
   ];
-
-  const renderScenario = (simulation: any, isSecondary: boolean = false) => {
-    if (!simulation) return null;
-    const cards = isDrenagem ? getDrenagemCards(simulation) : getBarragemCards(simulation);
-    const hazard = isDrenagem ? getDrainageHazard(simulation) : getDamHazard(simulation);
-
-    return (
-      <div className={`flex flex-col gap-4 ${isComparing ? 'w-full lg:w-1/2' : 'w-full'}`}>
-        {isComparing && (
-          <div className="flex items-center justify-between mb-2 border-b pb-2">
-             <span className="font-bold text-gray-700">
-               {isSecondary ? "Cenário B:" : "Cenário A:"} 
-             </span>
-             {isDrenagem ? (
-               <span className="text-sm px-2 py-1 bg-gray-100 rounded-md font-medium text-gray-700">
-                 ⏱️ {simulation.rain_duration} | 🌧️ {simulation.rain_intensity}
-               </span>
-             ) : (
-               <span className="text-sm px-2 py-1 bg-gray-100 rounded-md font-medium text-gray-700">
-                 {simulation.rupture_type}
-               </span>
-             )}
-          </div>
-        )}
-        
-        {/* Banner de Impacto Traduzido */}
-        {hazard && (
-          <div className={`flex items-start gap-4 p-5 rounded-2xl border shadow-sm transition-all ${hazard.color}`}>
-            <div className="text-3xl shrink-0 leading-none">{hazard.icon}</div>
-            <div className="flex flex-col">
-              <h5 className="font-bold text-sm uppercase tracking-wider mb-1">{hazard.level}</h5>
-              <p className="text-sm opacity-90 leading-relaxed font-medium">{hazard.message}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Grid de Cards Técnicos */}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 ${!isComparing && !isDrenagem ? 'lg:grid-cols-4' : (!isComparing ? 'lg:grid-cols-3' : '')} gap-5`}>
-          {cards.map((card) => (
-            <div
-              key={card.id}
-              className="bg-white rounded-xl border border-border-light shadow-sm hover:shadow-md transition-all duration-300 overflow-visible flex flex-col"
-            >
-              {/* Ícone e Título com Tooltip */}
-              <div className="w-full h-12 flex items-center px-4 relative" style={{ background: card.bgColor }}>
-                 <card.icon className="w-5 h-5 mr-2" style={{ color: card.color }} />
-                 <p className="text-xs text-text-muted uppercase tracking-wider font-semibold flex items-center gap-1.5 cursor-help group/tooltip">
-                   {card.title}
-                   {card.tooltip && (
-                     <span className="relative flex">
-                       <Info className="w-4 h-4 text-gray-400 hover:text-gray-700 transition-colors" />
-                       {/* Balão do Tooltip (Educativo) */}
-                       <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-gray-900 text-white text-[11px] sm:text-xs rounded-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 text-center shadow-xl pointer-events-none normal-case tracking-normal">
-                         {card.tooltip}
-                         <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-gray-900"></span>
-                       </span>
-                     </span>
-                   )}
-                 </p>
-              </div>
-              
-              {/* Valor */}
-              <div className="p-5 flex-1 flex flex-col justify-center">
-                <h4 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">
-                  {card.value || '-'}
-                </h4>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const youtubeId = sim?.video_url ? getYouTubeId(sim.video_url) : (sim?.media_url && getYouTubeId(sim.media_url) ? getYouTubeId(sim.media_url) : null);
-  const rawImageUrls = sim?.image_urls || [];
-  const legacyMedia = sim?.media_url && !getYouTubeId(sim.media_url) ? [sim.media_url] : [];
-  const finalImageUrls = rawImageUrls.length > 0 ? rawImageUrls : legacyMedia;
-  const isImage = finalImageUrls.length > 0;
-
-  // Para o cenário 2
-  const youtubeId2 = sim2?.video_url ? getYouTubeId(sim2.video_url) : (sim2?.media_url && getYouTubeId(sim2.media_url) ? getYouTubeId(sim2.media_url) : null);
-  const rawImageUrls2 = sim2?.image_urls || [];
-  const legacyMedia2 = sim2?.media_url && !getYouTubeId(sim2.media_url) ? [sim2.media_url] : [];
-  const finalImageUrls2 = rawImageUrls2.length > 0 ? rawImageUrls2 : legacyMedia2;
-  const isImage2 = finalImageUrls2.length > 0;
 
   const renderCarousel = (images: string[], currentIndex: number, setIndex: (i: number) => void) => {
     if (images.length === 0) return null;
     return (
-      <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex flex-col relative min-h-[250px] w-full">
-        <div className="flex-1 relative w-full h-full flex items-center justify-center">
-          <img src={images[currentIndex]} alt="Simulação" className="absolute inset-0 w-full h-full object-cover" />
+      <div className="flex-1 bg-gray-100 flex flex-col relative w-full h-full">
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+          <img src={images[currentIndex]} alt="Simulação" className="w-full h-full object-cover" />
           
           {images.length > 1 && (
             <>
               <button 
                 onClick={() => setIndex(currentIndex === 0 ? images.length - 1 : currentIndex - 1)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all z-10"
               >
                 &#8592;
               </button>
               <button 
                 onClick={() => setIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all z-10"
               >
                 &#8594;
               </button>
@@ -252,14 +160,144 @@ export default function SimulationResults({
         </div>
         
         {images.length > 1 && (
-          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
             {images.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setIndex(idx)}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentIndex ? 'bg-white scale-110 shadow-md' : 'bg-white/50 hover:bg-white/80'}`}
+                className={`w-3 h-3 rounded-full transition-all border border-black/20 ${idx === currentIndex ? 'bg-white scale-125 shadow-md' : 'bg-white/50 hover:bg-white/80'}`}
               />
             ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderScenario = (simulation: any, isSecondary: boolean = false) => {
+    if (!simulation) return null;
+    const cards = isDrenagem ? getDrenagemCards(simulation) : getBarragemCards(simulation);
+    const hazard = isDrenagem ? getDrainageHazard(simulation) : getDamHazard(simulation);
+
+    const simYoutubeId = simulation.video_url ? getYouTubeId(simulation.video_url) : (simulation.media_url ? getYouTubeId(simulation.media_url) : null);
+    const rawImageUrls = simulation.image_urls || [];
+    const legacyMedia = simulation.media_url && !getYouTubeId(simulation.media_url) ? [simulation.media_url] : [];
+    const finalImageUrls = rawImageUrls.length > 0 ? rawImageUrls : legacyMedia;
+    const hasImage = finalImageUrls.length > 0;
+    
+    const currentIndex = isSecondary ? currentImageIndex2 : currentImageIndex;
+    const setIndex = isSecondary ? setCurrentImageIndex2 : setCurrentImageIndex;
+
+    return (
+      <div className={`flex flex-col gap-6 ${isComparing ? 'w-full lg:w-1/2' : 'w-full'}`}>
+        {isComparing && (
+          <div className="flex items-center justify-between mb-2 border-b pb-3">
+             <span className="font-black text-gray-800 text-xl">
+               {isSecondary ? "Cenário B" : "Cenário A"} 
+             </span>
+             {isDrenagem ? (
+               <span className="text-sm px-3 py-1.5 bg-gray-100 rounded-lg font-bold text-gray-700 shadow-sm border border-gray-200">
+                 ⏱️ {simulation.rain_duration} | 🌧️ {simulation.rain_intensity}
+               </span>
+             ) : (
+               <span className="text-sm px-3 py-1.5 bg-gray-100 rounded-lg font-bold text-gray-700 shadow-sm border border-gray-200">
+                 {simulation.rupture_type}
+               </span>
+             )}
+          </div>
+        )}
+
+        {/* 1. MÍDIAS (Destaque Principal) */}
+        {(hasImage || simYoutubeId) && (
+          <div className="flex flex-col gap-5">
+            {hasImage && (
+              <div className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden flex flex-col">
+                <div className="px-5 py-3.5 border-b bg-gray-50 flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5 text-purple-600" />
+                  <h4 className="font-bold text-gray-900">Mapa / Visualização Técnica</h4>
+                </div>
+                <div className={`relative w-full ${isComparing ? 'min-h-[400px] h-[40vh]' : 'min-h-[550px] h-[65vh]'}`}>
+                  {renderCarousel(finalImageUrls, currentIndex, setIndex)}
+                </div>
+              </div>
+            )}
+
+            {simYoutubeId && (
+              <div className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden flex flex-col">
+                <div className="px-5 py-3.5 border-b bg-gray-50 flex items-center gap-2">
+                  <Play className="w-5 h-5 text-red-600" />
+                  <h4 className="font-bold text-gray-900">Vídeo Explicativo</h4>
+                </div>
+                <div className={`relative w-full ${isComparing ? 'min-h-[300px]' : 'min-h-[500px]'}`}>
+                  <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${simYoutubeId}`} frameBorder="0" allowFullScreen></iframe>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* 2. ALERTA DE IMPACTO */}
+        {hazard && (
+          <div className={`flex items-start gap-4 p-5 rounded-2xl border shadow-md transition-all ${hazard.color} mt-2`}>
+            <div className="text-4xl shrink-0 leading-none">{hazard.icon}</div>
+            <div className="flex flex-col">
+              <h5 className="font-bold text-sm uppercase tracking-wider mb-1">{hazard.level}</h5>
+              <p className="text-sm opacity-90 leading-relaxed font-medium">{hazard.message}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 3. DADOS TÉCNICOS (Extra) */}
+        <div className="mt-2">
+          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 pl-1">Parâmetros Técnicos Extras</h4>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 ${!isComparing && !isDrenagem ? 'lg:grid-cols-4' : (!isComparing ? 'lg:grid-cols-3' : '')} gap-4`}>
+            {cards.map((card) => (
+              <div
+                key={card.id}
+                className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-visible flex flex-col"
+              >
+                <div className="w-full h-11 flex items-center px-4 relative" style={{ background: card.bgColor }}>
+                   <card.icon className="w-4 h-4 mr-2" style={{ color: card.color }} />
+                   <p className="text-[11px] text-gray-600 uppercase tracking-wider font-bold flex items-center gap-1.5 cursor-help group/tooltip">
+                     {card.title}
+                     {card.tooltip && (
+                       <span className="relative flex">
+                         <Info className="w-3.5 h-3.5 text-gray-400 hover:text-gray-700 transition-colors" />
+                         <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-2.5 bg-gray-900 text-white text-[11px] sm:text-xs rounded-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 text-center shadow-xl pointer-events-none normal-case tracking-normal">
+                           {card.tooltip}
+                           <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-gray-900"></span>
+                         </span>
+                       </span>
+  };
+
+  const youtubeId = sim?.video_url ? getYouTubeId(sim.video_url) : (sim?.media_url && getYouTubeId(sim.media_url) ? getYouTubeId(sim.media_url) : null);
+  const rawImageUrls = sim?.image_urls || [];
+  const legacyMedia = sim?.media_url && !getYouTubeId(sim.media_url) ? [sim.media_url] : [];
+  const finalImageUrls = rawImageUrls.length > 0 ? rawImageUrls : legacyMedia;
+  const isImage = finalImageUrls.length > 0;
+                     )}
+                   </p>
+                </div>
+                <div className="p-4 flex-1 flex flex-col justify-center">
+                  <h4 className="text-xl sm:text-2xl font-black text-gray-900 break-words">
+                    {card.value || '-'}
+                  </h4>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 4. OBSERVAÇÕES */}
+        {simulation.others && simulation.others.trim() !== "" && (
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mt-auto">
+            <h4 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <Info className="w-4 h-4 text-secondary" />
+              Outras Informações / Observações
+            </h4>
+            <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+              {simulation.others}
+            </p>
           </div>
         )}
       </div>
@@ -409,100 +447,11 @@ export default function SimulationResults({
         </div>
       )}
 
-      {/* ÁREA DE RESULTADOS (Cartões e Impacto) */}
-      <div className={`flex flex-col ${isComparing ? 'lg:flex-row gap-8' : ''} mb-8`}>
+      {/* ÁREA DE RESULTADOS */}
+      <div className={`flex flex-col ${isComparing ? 'lg:flex-row gap-8' : ''}`}>
         {renderScenario(sim, false)}
         {isComparing && renderScenario(sim2, true)}
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Aba de Outros */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-full">
-          <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <Info className="w-5 h-5 text-secondary" />
-            Outras Informações / Observações
-          </h4>
-          <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">
-            {sim.others && sim.others.trim() !== "" ? sim.others : "Nenhuma observação adicional fornecida."}
-          </p>
-        </div>
-
-        {/* Media Player Único (Apenas Imagem OU Apenas Vídeo) */}
-        {(isImage && !youtubeId) && (
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-full flex flex-col">
-            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-purple-600" />
-              Galeria / Mapas
-            </h4>
-            {renderCarousel(finalImageUrls, currentImageIndex, setCurrentImageIndex)}
-          </div>
-        )}
-        
-        {(!isImage && youtubeId) && (
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-full flex flex-col">
-            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Play className="w-5 h-5 text-red-600" />
-              Vídeo Explicativo
-            </h4>
-            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[250px]">
-              <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${youtubeId}`} title="YouTube video player" frameBorder="0" allowFullScreen></iframe>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Mídia Dupla (Se houver AMBOS Imagem E Vídeo, os coloca lado a lado em uma nova linha) */}
-      {(isImage && youtubeId) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
-            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-purple-600" />
-              Galeria / Mapas
-            </h4>
-            {renderCarousel(finalImageUrls, currentImageIndex, setCurrentImageIndex)}
-          </div>
-          
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
-            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Play className="w-5 h-5 text-red-600" />
-              Vídeo Explicativo
-            </h4>
-            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[300px]">
-              <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${youtubeId}`} title="YouTube video player" frameBorder="0" allowFullScreen></iframe>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Cenário 2 Media (Se estiver no modo comparação) */}
-      {isComparing && (isImage2 || youtubeId2) && (
-        <div className="mt-8 border-t pt-8">
-           <h3 className="text-lg font-bold text-gray-800 mb-4">Mídias do Cenário B</h3>
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-             {isImage2 && (
-               <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
-                 <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
-                   <ImageIcon className="w-5 h-5 text-purple-600" />
-                   Galeria / Mapas
-                 </h4>
-                 {renderCarousel(finalImageUrls2, currentImageIndex2, setCurrentImageIndex2)}
-               </div>
-             )}
-             
-             {youtubeId2 && (
-               <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
-                 <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
-                   <Play className="w-5 h-5 text-red-600" />
-                   Vídeo Explicativo
-                 </h4>
-                 <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[300px]">
-                   <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${youtubeId2}`} title="YouTube video player" frameBorder="0" allowFullScreen></iframe>
-                 </div>
-               </div>
-             )}
-           </div>
-        </div>
-      )}
     </div>
   );
 }
