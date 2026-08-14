@@ -62,6 +62,8 @@ export default function SimulationForm({
   // Shared fields
   const [others, setOthers] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [customPointName, setCustomPointName] = useState("");
   const [customPoints, setCustomPoints] = useState<any[]>([]);
 
@@ -111,6 +113,7 @@ export default function SimulationForm({
 
       setOthers(initialData.others || "");
       setMediaUrl(initialData.media_url || "");
+      setVideoUrl(initialData.video_url || "");
     }
   }, [initialData]);
 
@@ -171,6 +174,29 @@ export default function SimulationForm({
       return;
     }
 
+    let finalMediaUrl = mediaUrl;
+
+    if (imageFile) {
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('simulations')
+        .upload(fileName, imageFile);
+        
+      if (uploadError) {
+        setError("Erro ao fazer upload da imagem: " + uploadError.message);
+        setLoading(false);
+        return;
+      }
+      
+      const { data: publicUrlData } = supabase.storage
+        .from('simulations')
+        .getPublicUrl(fileName);
+        
+      finalMediaUrl = publicUrlData.publicUrl;
+    }
+
     const payload: any = {
       type: simType,
       latitude: lat,
@@ -178,7 +204,8 @@ export default function SimulationForm({
       dam_id: finalDamId,
       dam_name: finalDamName,
       others: others,
-      media_url: mediaUrl,
+      media_url: finalMediaUrl,
+      video_url: videoUrl,
     };
 
     if (simType === "barragem") {
@@ -408,10 +435,51 @@ export default function SimulationForm({
             </>
           )}
 
-          <div className="pt-4 border-t">
-            <label className="block text-sm font-medium text-gray-700">URL da Mídia (YouTube, Google Drive, Imgur)</label>
-            <input type="url" value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm text-purple-700 font-medium" />
-            <p className="text-xs text-gray-500 mt-1">Insira um link para incorporar um vídeo ou foto à simulação.</p>
+          <div className="pt-4 border-t space-y-4">
+            <h4 className="font-semibold text-gray-700">3. Anexos e Mídia (Opcionais)</h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Box de Imagem */}
+              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 flex flex-col justify-between">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">📸 Foto / Mapa (Imagem)</label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        setImageFile(e.target.files[0]);
+                      }
+                    }}
+                    className="block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-md file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-secondary/10 file:text-secondary
+                      hover:file:bg-secondary/20
+                    "
+                  />
+                  {initialData && initialData.media_url && !imageFile && (
+                    <p className="text-xs text-green-600 mt-3 font-medium">✅ Uma imagem já está salva nesta simulação. Selecione outro arquivo apenas se desejar substituí-la.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Box de Vídeo */}
+              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 flex flex-col justify-between">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">🎥 Entrevista / Explicação (Vídeo)</label>
+                  <input 
+                    type="url" 
+                    value={videoUrl} 
+                    onChange={(e) => setVideoUrl(e.target.value)} 
+                    placeholder="https://youtube.com/watch?v=..." 
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border sm:text-sm text-red-600 font-medium" 
+                  />
+                  <p className="text-xs text-gray-500 mt-2">Insira um link do YouTube para exibir o reprodutor de vídeo incorporado.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>

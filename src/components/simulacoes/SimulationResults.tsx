@@ -210,8 +210,8 @@ export default function SimulationResults({
     );
   };
 
-  const youtubeId = sim.media_url ? getYouTubeId(sim.media_url) : null;
-  const isImage = sim.media_url ? sim.media_url.match(/\.(jpeg|jpg|gif|png)$/i) != null : false;
+  const youtubeId = sim.video_url ? getYouTubeId(sim.video_url) : (sim.media_url ? getYouTubeId(sim.media_url) : null);
+  const isImage = sim.media_url && !getYouTubeId(sim.media_url) ? true : false;
 
   return (
     <div className="animate-fade-in-up">
@@ -374,46 +374,56 @@ export default function SimulationResults({
           </p>
         </div>
 
-        {/* Media Player */}
-        {sim.media_url && (
+        {/* Media Player Único (Apenas Imagem OU Apenas Vídeo) */}
+        {(isImage && !youtubeId) && (
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-full flex flex-col">
             <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
-              {youtubeId ? <Play className="w-5 h-5 text-red-600" /> : <ImageIcon className="w-5 h-5 text-purple-600" />}
-              Mídia Anexada
+              <ImageIcon className="w-5 h-5 text-purple-600" />
+              Mapa ou Imagem Anexada
             </h4>
-            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[200px]">
-              {youtubeId ? (
-                <iframe
-                  className="absolute inset-0 w-full h-full"
-                  src={`https://www.youtube.com/embed/${youtubeId}`}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              ) : isImage ? (
-                <img
-                  src={sim.media_url}
-                  alt="Simulação"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="text-center p-4">
-                  <p className="text-sm text-gray-600 mb-2">Um link de arquivo foi anexado a esta simulação.</p>
-                  <a
-                    href={sim.media_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block px-4 py-2 bg-purple-100 text-purple-700 font-medium rounded-md hover:bg-purple-200"
-                  >
-                    Abrir Link Externo
-                  </a>
-                </div>
-              )}
+            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[250px]">
+              <img src={sim.media_url} alt="Simulação" className="w-full h-full object-cover" />
+            </div>
+          </div>
+        )}
+        
+        {(!isImage && youtubeId) && (
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-full flex flex-col">
+            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <Play className="w-5 h-5 text-red-600" />
+              Vídeo Explicativo
+            </h4>
+            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[250px]">
+              <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${youtubeId}`} title="YouTube video player" frameBorder="0" allowFullScreen></iframe>
             </div>
           </div>
         )}
       </div>
+
+      {/* Mídia Dupla (Se houver AMBOS Imagem E Vídeo, os coloca lado a lado em uma nova linha) */}
+      {(isImage && youtubeId) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
+            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-purple-600" />
+              Mapa ou Imagem Anexada
+            </h4>
+            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[300px]">
+              <img src={sim.media_url} alt="Simulação" className="w-full h-full object-cover" />
+            </div>
+          </div>
+          
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
+            <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <Play className="w-5 h-5 text-red-600" />
+              Vídeo Explicativo
+            </h4>
+            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[300px]">
+              <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${youtubeId}`} title="YouTube video player" frameBorder="0" allowFullScreen></iframe>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
