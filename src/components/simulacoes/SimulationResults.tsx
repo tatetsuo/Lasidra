@@ -68,6 +68,9 @@ export default function SimulationResults({
     ? Array.from(new Set(group.map(s => s.return_period_tag || "Geral")))
     : [];
 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex2, setCurrentImageIndex2] = useState(0);
+
   const getBarragemCards = (simulation: any) => [
     {
       id: "ruptura",
@@ -210,8 +213,58 @@ export default function SimulationResults({
     );
   };
 
-  const youtubeId = sim.video_url ? getYouTubeId(sim.video_url) : (sim.media_url ? getYouTubeId(sim.media_url) : null);
-  const isImage = sim.media_url && !getYouTubeId(sim.media_url) ? true : false;
+  const youtubeId = sim?.video_url ? getYouTubeId(sim.video_url) : (sim?.media_url && getYouTubeId(sim.media_url) ? getYouTubeId(sim.media_url) : null);
+  const rawImageUrls = sim?.image_urls || [];
+  const legacyMedia = sim?.media_url && !getYouTubeId(sim.media_url) ? [sim.media_url] : [];
+  const finalImageUrls = rawImageUrls.length > 0 ? rawImageUrls : legacyMedia;
+  const isImage = finalImageUrls.length > 0;
+
+  // Para o cenário 2
+  const youtubeId2 = sim2?.video_url ? getYouTubeId(sim2.video_url) : (sim2?.media_url && getYouTubeId(sim2.media_url) ? getYouTubeId(sim2.media_url) : null);
+  const rawImageUrls2 = sim2?.image_urls || [];
+  const legacyMedia2 = sim2?.media_url && !getYouTubeId(sim2.media_url) ? [sim2.media_url] : [];
+  const finalImageUrls2 = rawImageUrls2.length > 0 ? rawImageUrls2 : legacyMedia2;
+  const isImage2 = finalImageUrls2.length > 0;
+
+  const renderCarousel = (images: string[], currentIndex: number, setIndex: (i: number) => void) => {
+    if (images.length === 0) return null;
+    return (
+      <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex flex-col relative min-h-[250px] w-full">
+        <div className="flex-1 relative w-full h-full flex items-center justify-center">
+          <img src={images[currentIndex]} alt="Simulação" className="absolute inset-0 w-full h-full object-cover" />
+          
+          {images.length > 1 && (
+            <>
+              <button 
+                onClick={() => setIndex(currentIndex === 0 ? images.length - 1 : currentIndex - 1)}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all"
+              >
+                &#8592;
+              </button>
+              <button 
+                onClick={() => setIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all"
+              >
+                &#8594;
+              </button>
+            </>
+          )}
+        </div>
+        
+        {images.length > 1 && (
+          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setIndex(idx)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentIndex ? 'bg-white scale-110 shadow-md' : 'bg-white/50 hover:bg-white/80'}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="animate-fade-in-up">
@@ -379,11 +432,9 @@ export default function SimulationResults({
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 h-full flex flex-col">
             <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
               <ImageIcon className="w-5 h-5 text-purple-600" />
-              Mapa ou Imagem Anexada
+              Galeria / Mapas
             </h4>
-            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[250px]">
-              <img src={sim.media_url} alt="Simulação" className="w-full h-full object-cover" />
-            </div>
+            {renderCarousel(finalImageUrls, currentImageIndex, setCurrentImageIndex)}
           </div>
         )}
         
@@ -406,11 +457,9 @@ export default function SimulationResults({
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
             <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
               <ImageIcon className="w-5 h-5 text-purple-600" />
-              Mapa ou Imagem Anexada
+              Galeria / Mapas
             </h4>
-            <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[300px]">
-              <img src={sim.media_url} alt="Simulação" className="w-full h-full object-cover" />
-            </div>
+            {renderCarousel(finalImageUrls, currentImageIndex, setCurrentImageIndex)}
           </div>
           
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
@@ -422,6 +471,36 @@ export default function SimulationResults({
               <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${youtubeId}`} title="YouTube video player" frameBorder="0" allowFullScreen></iframe>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Cenário 2 Media (Se estiver no modo comparação) */}
+      {isComparing && (isImage2 || youtubeId2) && (
+        <div className="mt-8 border-t pt-8">
+           <h3 className="text-lg font-bold text-gray-800 mb-4">Mídias do Cenário B</h3>
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+             {isImage2 && (
+               <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
+                 <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
+                   <ImageIcon className="w-5 h-5 text-purple-600" />
+                   Galeria / Mapas
+                 </h4>
+                 {renderCarousel(finalImageUrls2, currentImageIndex2, setCurrentImageIndex2)}
+               </div>
+             )}
+             
+             {youtubeId2 && (
+               <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
+                 <h4 className="text-md font-bold text-gray-900 mb-3 flex items-center gap-2">
+                   <Play className="w-5 h-5 text-red-600" />
+                   Vídeo Explicativo
+                 </h4>
+                 <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative min-h-[300px]">
+                   <iframe className="absolute inset-0 w-full h-full" src={`https://www.youtube.com/embed/${youtubeId2}`} title="YouTube video player" frameBorder="0" allowFullScreen></iframe>
+                 </div>
+               </div>
+             )}
+           </div>
         </div>
       )}
     </div>

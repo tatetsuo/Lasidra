@@ -63,7 +63,8 @@ export default function SimulationForm({
   const [others, setOthers] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [customPointName, setCustomPointName] = useState("");
   const [customPoints, setCustomPoints] = useState<any[]>([]);
 
@@ -114,6 +115,13 @@ export default function SimulationForm({
       setOthers(initialData.others || "");
       setMediaUrl(initialData.media_url || "");
       setVideoUrl(initialData.video_url || "");
+      
+      // Migrate legacy media_url to image_urls if applicable
+      let initImageUrls = initialData.image_urls || [];
+      if (initImageUrls.length === 0 && initialData.media_url && initialData.media_url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+        initImageUrls = [initialData.media_url];
+      }
+      setImageUrls(initImageUrls);
     }
   }, [initialData]);
 
@@ -174,27 +182,36 @@ export default function SimulationForm({
       return;
     }
 
-    let finalMediaUrl = mediaUrl;
+    const finalImageUrls: string[] = [...imageUrls];
 
-    if (imageFile) {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('simulations')
-        .upload(fileName, imageFile);
-        
-      if (uploadError) {
-        setError("Erro ao fazer upload da imagem: " + uploadError.message);
+    if (imageFiles.length > 0) {
+      try {
+        const uploadPromises = imageFiles.map(async (file) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('simulations')
+            .upload(fileName, file);
+            
+          if (uploadError) {
+            throw new Error(uploadError.message);
+          }
+          
+          const { data: publicUrlData } = supabase.storage
+            .from('simulations')
+            .getPublicUrl(fileName);
+            
+          return publicUrlData.publicUrl;
+        });
+
+        const uploadedUrls = await Promise.all(uploadPromises);
+        finalImageUrls.push(...uploadedUrls);
+      } catch (err: any) {
+        setError("Erro ao fazer upload de imagens: " + err.message);
         setLoading(false);
         return;
       }
-      
-      const { data: publicUrlData } = supabase.storage
-        .from('simulations')
-        .getPublicUrl(fileName);
-        
-      finalMediaUrl = publicUrlData.publicUrl;
     }
 
     const payload: any = {
@@ -204,8 +221,9 @@ export default function SimulationForm({
       dam_id: finalDamId,
       dam_name: finalDamName,
       others: others,
-      media_url: finalMediaUrl,
+      media_url: mediaUrl,
       video_url: videoUrl,
+      image_urls: finalImageUrls,
     };
 
     if (simType === "barragem") {
@@ -442,13 +460,14 @@ export default function SimulationForm({
               {/* Box de Imagem */}
               <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 flex flex-col justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">📸 Foto / Mapa (Imagem)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">📸 Fotos / Mapas (Imagens)</label>
                   <input 
                     type="file" 
                     accept="image/*"
+                    multiple
                     onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        setImageFile(e.target.files[0]);
+                      if (e.target.files) {
+                        setImageFiles(Array.from(e.target.files));
                       }
                     }}
                     className="block w-full text-sm text-gray-500
@@ -459,8 +478,20 @@ export default function SimulationForm({
                       hover:file:bg-secondary/20
                     "
                   />
-                  {initialData && initialData.media_url && !imageFile && (
-                    <p className="text-xs text-green-600 mt-3 font-medium">✅ Uma imagem já está salva nesta simulação. Selecione outro arquivo apenas se desejar substituí-la.</p>
+                  {imageFiles.length > 0 && (
+                    <p className="text-xs text-blue-600 mt-2 font-medium">{imageFiles.length} arquivo(s) selecionado(s) pronto(s) para envio.</p>
+                  )}
+                  {imageUrls.length > 0 && (
+                    <div className="mt-3 bg-white p-2 border border-gray-200 rounded-md">
+                      <p className="text-xs text-green-700 font-medium mb-2">✅ {imageUrls.length} imagem(ns) já salva(s) na nuvem.</p>
+                      <button 
+                        type="button" 
+                        onClick={() => setImageUrls([])} 
+                        className="text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded"
+                      >
+                        Apagar Todas as Salvas
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
