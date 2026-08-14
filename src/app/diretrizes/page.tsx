@@ -11,7 +11,7 @@ export default function DiretrizesPage() {
   return (
     <>
       {/* Page hero */}
-      <section className="bg-gradient-hero text-white py-16 sm:py-20">
+      <section className="bg-gradient-hero text-white py-16 sm:py-20 transition-colors duration-500 border-b border-primary-light/10 dark:border-slate-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 mb-6">
             <Scale className="w-8 h-8 text-secondary" />
@@ -27,16 +27,16 @@ export default function DiretrizesPage() {
       </section>
 
       {/* Content */}
-      <section className="py-16 sm:py-20 bg-bg-primary">
+      <section className="py-16 sm:py-20 bg-bg-primary dark:bg-slate-950 transition-colors duration-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Important notice */}
-          <div className="bg-secondary-50 border border-secondary/20 rounded-xl p-6 mb-12 flex items-start gap-4">
-            <AlertTriangle className="w-6 h-6 text-secondary shrink-0 mt-0.5" />
+          <div className="bg-secondary-50 dark:bg-slate-900 border border-secondary/20 dark:border-slate-800 rounded-xl p-6 mb-12 flex items-start gap-4 transition-colors duration-500">
+            <AlertTriangle className="w-6 h-6 text-secondary dark:text-alert-orange shrink-0 mt-0.5" />
             <div>
-              <h2 className="text-base font-bold text-text-primary mb-1">
+              <h2 className="text-base font-bold text-text-primary dark:text-white mb-1">
                 Aviso Importante
               </h2>
-              <p className="text-sm text-text-secondary leading-relaxed">
+              <p className="text-sm text-text-secondary dark:text-gray-400 leading-relaxed">
                 Ao acessar e utilizar o portal UFPI !AVISA! e suas simulações,
                 você concorda com os termos e condições descritos abaixo. Leia
                 atentamente antes de prosseguir.
@@ -49,16 +49,16 @@ export default function DiretrizesPage() {
             {/* Section 1 */}
             <div>
               <div className="flex items-center gap-3 mb-5">
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white text-sm font-bold">
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary dark:bg-blue-600 text-white text-sm font-bold shadow-sm">
                   1
                 </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
+                <h2 className="text-xl sm:text-2xl font-bold text-text-primary dark:text-white">
                   Termos de Uso
                 </h2>
               </div>
-              <div className="pl-11 space-y-4 text-text-secondary text-sm leading-relaxed">
+              <div className="pl-11 space-y-4 text-text-secondary dark:text-gray-400 text-sm leading-relaxed">
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     1.1. Aceitação dos Termos.
                   </strong>{" "}
                   O acesso e a utilização do portal UFPI !AVISA!, incluindo
@@ -69,7 +69,7 @@ export default function DiretrizesPage() {
                   estabelecidas.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     1.2. Natureza dos Dados.
                   </strong>{" "}
                   As simulações e dados apresentados neste portal são resultados
@@ -80,7 +80,7 @@ export default function DiretrizesPage() {
                   competentes.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     1.3. Limitação de Responsabilidade.
                   </strong>{" "}
                   O Lasidra e a UFPI não se responsabilizam por decisões tomadas
@@ -89,7 +89,7 @@ export default function DiretrizesPage() {
                   referência complementar a análises técnicas especializadas.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     1.4. Uso Permitido.
                   </strong>{" "}
                   O conteúdo do portal pode ser utilizado para fins acadêmicos,
@@ -98,7 +98,7 @@ export default function DiretrizesPage() {
                   autorais descritas na Seção 2.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     1.5. Uso Proibido.
                   </strong>{" "}
                   É expressamente proibido: (a) utilizar os dados para fins
@@ -111,21 +111,21 @@ export default function DiretrizesPage() {
               </div>
             </div>
 
-            <hr className="border-border-light" />
+            <hr className="border-border-light dark:border-slate-800" />
 
             {/* Section 2 */}
             <div>
               <div className="flex items-center gap-3 mb-5">
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white text-sm font-bold">
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary dark:bg-blue-600 text-white text-sm font-bold shadow-sm">
                   2
                 </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
+                <h2 className="text-xl sm:text-2xl font-bold text-text-primary dark:text-white">
                   Direitos Autorais e Propriedade Intelectual
                 </h2>
               </div>
-              <div className="pl-11 space-y-4 text-text-secondary text-sm leading-relaxed">
+              <div className="pl-11 space-y-4 text-text-secondary dark:text-gray-400 text-sm leading-relaxed">
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     2.1. Titularidade.
                   </strong>{" "}
                   Todo o conteúdo disponibilizado no portal UFPI !AVISA! —
@@ -137,20 +137,20 @@ export default function DiretrizesPage() {
                   propriedade intelectual aplicável.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     2.2. Citação e Referência.
                   </strong>{" "}
                   A utilização dos dados e simulações em publicações acadêmicas,
                   relatórios técnicos ou materiais educacionais deve obrigatoriamente
                   incluir a seguinte citação:
                 </p>
-                <div className="bg-bg-secondary rounded-lg p-4 border border-border-light font-mono text-xs">
+                <div className="bg-bg-secondary dark:bg-slate-800 rounded-lg p-4 border border-border-light dark:border-slate-700 font-mono text-xs text-text-primary dark:text-gray-300">
                   LASIDRA/UFPI. Portal UFPI !AVISA! — Simulações Hidrológicas e
                   Alertas Meteorológicos. Universidade Federal do Piauí,
                   Teresina, PI. Disponível em: [URL]. Acesso em: [data].
                 </div>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     2.3. Licenciamento.
                   </strong>{" "}
                   Salvo indicação expressa em contrário, os dados e simulações
@@ -162,21 +162,21 @@ export default function DiretrizesPage() {
               </div>
             </div>
 
-            <hr className="border-border-light" />
+            <hr className="border-border-light dark:border-slate-800" />
 
             {/* Section 3 */}
             <div>
               <div className="flex items-center gap-3 mb-5">
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white text-sm font-bold">
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary dark:bg-blue-600 text-white text-sm font-bold shadow-sm">
                   3
                 </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
+                <h2 className="text-xl sm:text-2xl font-bold text-text-primary dark:text-white">
                   Política de Privacidade
                 </h2>
               </div>
-              <div className="pl-11 space-y-4 text-text-secondary text-sm leading-relaxed">
+              <div className="pl-11 space-y-4 text-text-secondary dark:text-gray-400 text-sm leading-relaxed">
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     3.1. Coleta de Dados.
                   </strong>{" "}
                   O portal pode coletar dados de navegação anônimos (como
@@ -185,7 +185,7 @@ export default function DiretrizesPage() {
                   coletado sem o consentimento explícito do usuário.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     3.2. Cookies.
                   </strong>{" "}
                   O portal pode utilizar cookies essenciais para o funcionamento
@@ -193,7 +193,7 @@ export default function DiretrizesPage() {
                   apenas com o consentimento do usuário.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     3.3. Compartilhamento.
                   </strong>{" "}
                   Os dados de navegação coletados não serão compartilhados com
@@ -202,21 +202,21 @@ export default function DiretrizesPage() {
               </div>
             </div>
 
-            <hr className="border-border-light" />
+            <hr className="border-border-light dark:border-slate-800" />
 
             {/* Section 4 */}
             <div>
               <div className="flex items-center gap-3 mb-5">
-                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white text-sm font-bold">
+                <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary dark:bg-blue-600 text-white text-sm font-bold shadow-sm">
                   4
                 </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
+                <h2 className="text-xl sm:text-2xl font-bold text-text-primary dark:text-white">
                   Disposições Gerais
                 </h2>
               </div>
-              <div className="pl-11 space-y-4 text-text-secondary text-sm leading-relaxed">
+              <div className="pl-11 space-y-4 text-text-secondary dark:text-gray-400 text-sm leading-relaxed">
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     4.1. Alterações.
                   </strong>{" "}
                   O Lasidra reserva-se o direito de alterar estes termos a
@@ -224,7 +224,7 @@ export default function DiretrizesPage() {
                   vigor imediatamente após sua publicação no portal.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     4.2. Legislação Aplicável.
                   </strong>{" "}
                   Estes termos são regidos pela legislação da República
@@ -232,14 +232,14 @@ export default function DiretrizesPage() {
                   foro da Comarca de Teresina, estado do Piauí.
                 </p>
                 <p>
-                  <strong className="text-text-primary">
+                  <strong className="text-text-primary dark:text-gray-200">
                     4.3. Contato.
                   </strong>{" "}
                   Para dúvidas, sugestões ou solicitações relacionadas a estes
                   termos, entre em contato pelo e-mail{" "}
                   <a
                     href="mailto:lasidra@ufpi.edu.br"
-                    className="text-primary hover:text-primary-light font-semibold transition-colors"
+                    className="text-primary hover:text-primary-light dark:text-blue-400 font-semibold transition-colors"
                   >
                     lasidra@ufpi.edu.br
                   </a>
@@ -250,21 +250,21 @@ export default function DiretrizesPage() {
           </div>
 
           {/* Last updated */}
-          <div className="mt-12 pt-8 border-t border-border-light flex items-center gap-3 text-text-muted text-sm">
+          <div className="mt-12 pt-8 border-t border-border-light dark:border-slate-800 flex items-center gap-3 text-text-muted dark:text-gray-500 text-sm">
             <FileText className="w-4 h-4" />
             <p>
-              <strong>Última atualização:</strong> Junho de 2026
+              <strong className="dark:text-gray-400">Última atualização:</strong> Junho de 2026
             </p>
           </div>
 
           {/* Agreement note */}
-          <div className="mt-8 bg-primary-50 rounded-xl p-6 flex items-start gap-4">
-            <ShieldCheck className="w-6 h-6 text-primary shrink-0 mt-0.5" />
+          <div className="mt-8 bg-primary-50 dark:bg-slate-900 rounded-xl p-6 flex items-start gap-4 border border-transparent dark:border-slate-800">
+            <ShieldCheck className="w-6 h-6 text-primary dark:text-blue-400 shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-sm font-bold text-text-primary mb-1">
+              <h3 className="text-sm font-bold text-text-primary dark:text-white mb-1">
                 Ao utilizar o portal, você concorda
               </h3>
-              <p className="text-xs text-text-secondary leading-relaxed">
+              <p className="text-xs text-text-secondary dark:text-gray-400 leading-relaxed">
                 A utilização contínua do portal UFPI !AVISA! após a publicação
                 de quaisquer alterações nestes termos constitui aceitação dessas
                 alterações. Recomendamos que você revise periodicamente esta

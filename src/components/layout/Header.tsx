@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, FlaskConical } from "lucide-react";
+import { Menu, X, FlaskConical, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const navItems = [
   { label: "Quem Somos", href: "/quem-somos" },
@@ -15,9 +16,12 @@ const navItems = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
@@ -34,8 +38,8 @@ export default function Header() {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-header"
-          : "bg-white"
+          ? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-header dark:shadow-[0_2px_10px_rgba(0,0,0,0.5)] border-b border-transparent dark:border-slate-800"
+          : "bg-white dark:bg-slate-900 border-b border-transparent dark:border-slate-800"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,10 +54,10 @@ export default function Header() {
               <FlaskConical className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl sm:text-2xl font-bold tracking-tight text-primary">
+              <span className="text-xl sm:text-2xl font-bold tracking-tight text-primary dark:text-white transition-colors">
                 Lasidra
               </span>
-              <span className="text-[10px] sm:text-xs font-medium text-text-secondary -mt-1 tracking-wider uppercase">
+              <span className="text-[10px] sm:text-xs font-medium text-text-secondary dark:text-gray-400 -mt-1 tracking-wider uppercase transition-colors">
                 UFPI
               </span>
             </div>
@@ -73,8 +77,8 @@ export default function Header() {
                   id={`nav-${item.href.replace("/", "")}`}
                   className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-250 ${
                     isActive
-                      ? "text-primary bg-primary-50"
-                      : "text-text-secondary hover:text-primary hover:bg-primary-50/50"
+                      ? "text-primary dark:text-blue-400 bg-primary-50 dark:bg-blue-900/30"
+                      : "text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary-50/50 dark:hover:bg-slate-800"
                   }`}
                 >
                   {item.label}
@@ -86,33 +90,46 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right spacer (empty — keeps layout balanced) */}
-          <div className="hidden lg:block w-[140px]" />
+          {/* Actions: Theme Toggle + Mobile Menu */}
+          <div className="flex items-center justify-end gap-2 shrink-0 lg:w-[140px]">
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-text-secondary hover:text-primary hover:bg-primary-50/50 transition-colors"
+              aria-label="Alternar tema"
+              id="theme-toggle"
+            >
+              {mounted && theme === "dark" ? (
+                <Sun className="w-5 h-5 text-secondary-light" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-text-secondary hover:text-primary hover:bg-primary-50/50 transition-colors"
-            aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
-            id="mobile-menu-toggle"
-          >
-            {mobileMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-text-secondary hover:text-primary hover:bg-primary-50/50 transition-colors"
+              aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+              id="mobile-menu-toggle"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Navigation */}
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 ${
           mobileMenuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <nav
-          className="px-4 pb-4 space-y-1 border-t border-border-light"
+          className="px-4 pb-4 space-y-1 border-t border-border-light dark:border-slate-800"
           id="mobile-nav"
         >
           {navItems.map((item, index) => {
@@ -124,8 +141,8 @@ export default function Header() {
                 id={`mobile-nav-${item.href.replace("/", "")}`}
                 className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? "text-primary bg-primary-50 border-l-3 border-secondary"
-                    : "text-text-secondary hover:text-primary hover:bg-primary-50/30"
+                    ? "text-primary dark:text-blue-400 bg-primary-50 dark:bg-blue-900/30 border-l-3 border-secondary dark:border-blue-500"
+                    : "text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary-50/30 dark:hover:bg-slate-800"
                 }`}
                 style={{
                   animationDelay: `${index * 50}ms`,

@@ -23,9 +23,8 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-primary text-white" id="footer">
-      {/* Top accent bar */}
-      <div className="h-1 bg-gradient-to-r from-secondary via-secondary-light to-secondary" />
+    <footer className="bg-primary dark:bg-slate-950 text-white transition-colors duration-500 border-t-4 border-secondary" id="footer">
+      {/* Top accent bar is now handled by border-t-4 */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main footer content */}
@@ -44,10 +43,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-white/70 text-sm leading-relaxed mb-6">
-              Laboratório de Sistemas de Informações e Decisões aplicados a
-              Recursos Hídricos e Ambientais. Vinculado à Universidade Federal
-              do Piauí, dedicado à pesquisa em recursos hídricos, simulações
-              hidrológicas e alertas meteorológicos.
+              Laboratório de Simulações de Drenagens e Represas da Universidade Federal do Piauí, dedicado à pesquisa em recursos hídricos, simulações hidrológicas e alertas meteorológicos.
             </p>
             <a
               href="https://www.instagram.com/lasidra_ufpi"

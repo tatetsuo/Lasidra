@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -44,11 +45,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
-      <body className="font-[family-name:var(--font-inter)] min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
+      <body className="font-[family-name:var(--font-inter)] min-h-screen flex flex-col bg-bg-primary dark:bg-slate-900 dark:text-gray-100">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

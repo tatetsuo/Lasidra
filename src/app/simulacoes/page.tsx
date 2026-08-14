@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { FlaskConical, Loader2 } from "lucide-react";
 import SimulationResults from "@/components/simulacoes/SimulationResults";
+import AgreementModal from "@/components/simulacoes/AgreementModal";
 
 /* Importação dinâmica — Leaflet não funciona com SSR */
 const SimulationMap = dynamic(
@@ -11,9 +12,9 @@ const SimulationMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center h-full bg-bg-tertiary">
-        <div className="flex flex-col items-center gap-3 text-text-muted">
-          <Loader2 className="w-8 h-8 animate-spin text-primary/40" />
+      <div className="flex items-center justify-center h-full bg-bg-tertiary dark:bg-slate-800">
+        <div className="flex flex-col items-center gap-3 text-text-muted dark:text-gray-400">
+          <Loader2 className="w-8 h-8 animate-spin text-primary/40 dark:text-blue-500/40" />
           <span className="text-sm font-medium">Carregando mapa…</span>
         </div>
       </div>
@@ -23,9 +24,22 @@ const SimulationMap = dynamic(
 
 export default function SimulacoesPage() {
   const [selectedSimulationGroup, setSelectedSimulationGroup] = useState<any[] | null>(null);
+  const [pendingGroup, setPendingGroup] = useState<any[] | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleSelectSimulation = (group: any[]) => {
+    // Verifica se já aceitou
+    const hasAgreed = localStorage.getItem("lasidra_agreed_terms") === "true";
+    if (hasAgreed) {
+      proceedWithSimulation(group);
+    } else {
+      setPendingGroup(group);
+      setShowModal(true);
+    }
+  };
+
+  const proceedWithSimulation = (group: any[]) => {
     setSelectedSimulationGroup(group);
     // Scroll to results after a brief delay for the animation
     setTimeout(() => {
@@ -36,6 +50,20 @@ export default function SimulacoesPage() {
     }, 150);
   };
 
+  const handleAcceptTerms = () => {
+    localStorage.setItem("lasidra_agreed_terms", "true");
+    setShowModal(false);
+    if (pendingGroup) {
+      proceedWithSimulation(pendingGroup);
+      setPendingGroup(null);
+    }
+  };
+
+  const handleDeclineTerms = () => {
+    setShowModal(false);
+    setPendingGroup(null);
+  };
+
   const handleClose = () => {
     setSelectedSimulationGroup(null);
     // Scroll back to map
@@ -44,17 +72,23 @@ export default function SimulacoesPage() {
 
   return (
     <>
+      <AgreementModal 
+        isOpen={showModal} 
+        onAccept={handleAcceptTerms} 
+        onDecline={handleDeclineTerms} 
+      />
+
       {/* Hero reduzido — barra fina */}
-      <section className="bg-primary py-5 sm:py-6">
+      <section className="bg-primary dark:bg-slate-950 py-5 sm:py-6 transition-colors duration-500 border-b border-primary-light/10 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-4">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 shrink-0">
-            <FlaskConical className="w-5 h-5 text-secondary" />
+            <FlaskConical className="w-5 h-5 text-secondary dark:text-blue-400" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-white">
               Simulações
             </h1>
-            <p className="text-white/50 text-xs sm:text-sm">
+            <p className="text-white/60 text-xs sm:text-sm font-medium">
               Clique em um ponto de simulação no mapa para visualizar os resultados detalhados
             </p>
           </div>
@@ -62,7 +96,7 @@ export default function SimulacoesPage() {
       </section>
 
       {/* Map section */}
-      <section className="bg-bg-secondary">
+      <section className="bg-bg-secondary dark:bg-slate-900 transition-colors duration-500">
         <div
           className={`transition-all duration-500 ease-in-out ${
             selectedSimulationGroup ? "h-[40vh]" : "h-[70vh]"
@@ -79,7 +113,7 @@ export default function SimulacoesPage() {
       {selectedSimulationGroup && (
         <section
           ref={resultsRef}
-          className="py-8 sm:py-10 bg-bg-secondary"
+          className="py-8 sm:py-12 bg-bg-secondary dark:bg-slate-900 transition-colors duration-500"
           id="simulation-results-section"
         >
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -90,16 +124,16 @@ export default function SimulacoesPage() {
 
       {/* Empty state — when no simulation selected */}
       {!selectedSimulationGroup && (
-        <section className="py-10 bg-bg-secondary">
-          <div className="max-w-2xl mx-auto px-4 text-center">
-            <div className="bg-white rounded-xl border border-border-light shadow-sm p-8">
-              <div className="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mx-auto mb-4">
-                <FlaskConical className="w-7 h-7 text-primary" />
+        <section className="py-12 sm:py-16 bg-bg-secondary dark:bg-slate-900 transition-colors duration-500 flex-1 flex flex-col items-center justify-center">
+          <div className="max-w-2xl mx-auto px-4 text-center w-full">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl border border-border-light dark:border-slate-700 shadow-sm p-10 transition-colors duration-500">
+              <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-5">
+                <FlaskConical className="w-8 h-8 text-primary dark:text-blue-400" />
               </div>
-              <h3 className="text-lg font-bold text-text-primary mb-2">
+              <h3 className="text-xl font-bold text-text-primary dark:text-white mb-3">
                 Selecione uma simulação
               </h3>
-              <p className="text-text-muted text-sm leading-relaxed">
+              <p className="text-text-muted dark:text-gray-400 text-sm sm:text-base leading-relaxed max-w-md mx-auto">
                 Clique em um dos pontos no mapa acima para visualizar
                 os cenários de simulação cadastrados pelo administrador.
               </p>

@@ -35,29 +35,29 @@ const disasters = [
 
 export default function DisasterCards() {
   return (
-    <section className="py-16 sm:py-20 bg-bg-primary" id="disaster-cards-section">
+    <section className="py-16 sm:py-24 bg-bg-primary dark:bg-slate-950 transition-colors duration-500" id="disaster-cards-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-alert-orange bg-alert-orange/10 px-3 py-1 rounded-full mb-4">
-            <AlertTriangle className="w-3.5 h-3.5" />
+        <div className="text-center mb-16">
+          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-alert-orange bg-alert-orange/10 dark:bg-alert-orange/20 px-4 py-1.5 rounded-full mb-4">
+            <AlertTriangle className="w-4 h-4" />
             Desastres
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary dark:text-white mb-4 tracking-tight">
             Informação que Salva Vidas
           </h2>
-          <p className="text-text-secondary text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="text-text-secondary dark:text-gray-400 text-base sm:text-lg max-w-2xl mx-auto font-medium">
             Mantenha-se informado sobre riscos de inundação, medidas preventivas
             e avanços tecnológicos no monitoramento hidrológico do Piauí.
           </p>
         </div>
 
         {/* Cards grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {disasters.map((item, index) => (
             <article
               key={item.id}
-              className="group bg-white rounded-xl border border-border-light shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden hover:-translate-y-1"
+              className="group bg-white dark:bg-slate-900 rounded-2xl border border-border-light dark:border-slate-800 shadow-md hover:shadow-2xl dark:shadow-none dark:hover:shadow-[0_10px_40px_rgba(37,99,235,0.15)] transition-all duration-500 overflow-hidden hover:-translate-y-2 flex flex-col"
               id={`disaster-card-${item.id}`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
@@ -67,15 +67,15 @@ export default function DisasterCards() {
                   src={item.image}
                   alt={item.title}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {/* Tag badge */}
                 <div className="absolute top-4 left-4">
                   <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${item.tagColor}`}
+                    className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold backdrop-blur-md bg-white/90 dark:bg-slate-900/90 shadow-sm ${item.tagColor.replace('/10', '/0')}`}
                   >
                     {item.tag}
                   </span>
@@ -83,19 +83,19 @@ export default function DisasterCards() {
               </div>
 
               {/* Content */}
-              <div className="p-5 sm:p-6">
-                <h3 className="text-base sm:text-lg font-bold text-text-primary mb-2 leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+              <div className="p-6 sm:p-8 flex-1 flex flex-col">
+                <h3 className="text-lg sm:text-xl font-bold text-text-primary dark:text-gray-100 mb-3 leading-tight line-clamp-2 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-3">
+                <p className="text-text-secondary dark:text-gray-400 text-sm sm:text-base leading-relaxed mb-6 line-clamp-3 flex-1">
                   {item.description}
                 </p>
                 <button
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-light transition-colors group/btn"
+                  className="inline-flex items-center gap-2 text-sm font-bold text-primary dark:text-blue-400 hover:text-primary-light dark:hover:text-blue-300 transition-colors group/btn mt-auto"
                   aria-label={`Saiba mais sobre ${item.title}`}
                 >
                   Saiba mais
-                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1.5" />
                 </button>
               </div>
             </article>
