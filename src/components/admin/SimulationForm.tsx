@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { barragens } from "@/data/barragens";
 import dynamic from "next/dynamic";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { Upload, X, MapPin, Construction, CloudRain, ImageIcon, Video, CheckCircle2 } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -41,9 +42,9 @@ export default function SimulationForm({
   const [error, setError] = useState<string | null>(null);
 
   // Form state
-  const [selectedDamId, setSelectedDamId] = useState<string>("");
-  const [lat, setLat] = useState<number | "">("");
-  const [lng, setLng] = useState<number | "">("");
+  const [selectedDamId, setSelectedDamId] = useState<string>(simType === "barragem" ? "1" : "");
+  const [lat, setLat] = useState<number | "">(simType === "barragem" ? barragens[0].lat : "");
+  const [lng, setLng] = useState<number | "">(simType === "barragem" ? barragens[0].lng : "");
   
   // Barragem fields
   const [ruptureType, setRuptureType] = useState("Overtopping (Galgamento)");
@@ -67,6 +68,10 @@ export default function SimulationForm({
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [customPointName, setCustomPointName] = useState("");
   const [customPoints, setCustomPoints] = useState<any[]>([]);
+  const [timeOfDay, setTimeOfDay] = useState("Dia");
+  const [existingImageTitles, setExistingImageTitles] = useState<string[]>([]);
+  const [newImageTitles, setNewImageTitles] = useState<string[]>([]);
+  const [existingSimulations, setExistingSimulations] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchCustomPoints = async () => {
@@ -84,6 +89,11 @@ export default function SimulationForm({
       }
     };
     fetchCustomPoints();
+    const fetchExistingSims = async () => {
+      const { data } = await supabase.from("simulations").select("id, type, dam_name, rupture_type");
+      if (data) setExistingSimulations(data);
+    };
+    fetchExistingSims();
   }, []);
 
   useEffect(() => {
@@ -115,6 +125,7 @@ export default function SimulationForm({
       setOthers(initialData.others || "");
       setMediaUrl(initialData.media_url || "");
       setVideoUrl(initialData.video_url || "");
+      setTimeOfDay(initialData.time_of_day || "Dia");
       
       // Migrate legacy media_url to image_urls if applicable
       let initImageUrls = initialData.image_urls || [];
@@ -122,6 +133,7 @@ export default function SimulationForm({
         initImageUrls = [initialData.media_url];
       }
       setImageUrls(initImageUrls);
+      setExistingImageTitles(initialData.image_titles || new Array(initImageUrls.length).fill(""));
     }
   }, [initialData]);
 
@@ -165,6 +177,7 @@ export default function SimulationForm({
     setError(null);
 
     const finalRuptureType = ruptureType === "Outro" ? customRupture : ruptureType;
+
     let finalDamName = "";
     let finalDamId = null;
     
@@ -174,6 +187,15 @@ export default function SimulationForm({
     } else {
       finalDamName = customPointName;
       finalDamId = null;
+    }
+
+    if (simType === "barragem" && finalDamName) {
+      const exists = existingSimulations.find(s => s.type === "barragem" && s.dam_name === finalDamName && s.rupture_type === finalRuptureType);
+      if (exists && (!initialData || initialData.id !== exists.id)) {
+        setError(`Já existe uma simulação de ${finalRuptureType} para esta barragem. Se desejar alterá-la, edite a simulação existente.`);
+        setLoading(false);
+        return;
+      }
     }
 
     if (!finalDamName && finalDamId === null) {
@@ -224,6 +246,8 @@ export default function SimulationForm({
       media_url: mediaUrl,
       video_url: videoUrl,
       image_urls: finalImageUrls,
+      image_titles: [...existingImageTitles, ...newImageTitles],
+      time_of_day: timeOfDay,
     };
 
     if (simType === "barragem") {
@@ -281,10 +305,12 @@ export default function SimulationForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm animate-fade-in-up">
       <h3 className="text-xl font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
-        {simType === "barragem" ? "🚧 " : "🌧️ "}
-        {initialData 
-          ? `Editar Simulação de ${simType === 'barragem' ? 'Barragem' : 'Drenagem'}` 
-          : `Nova Simulação de ${simType === 'barragem' ? 'Barragem' : 'Drenagem'}`}
+        <span className="flex items-center gap-2">
+          {simType === "barragem" ? <Construction className="w-5 h-5" /> : <CloudRain className="w-5 h-5" />}
+          {initialData 
+            ? `Editar Simulação de ${simType === 'barragem' ? 'Barragem' : 'Drenagem'}` 
+            : `Nova Simulação de ${simType === 'barragem' ? 'Barragem' : 'Drenagem'}`}
+        </span>
       </h3>
       
       {error && <div className="p-3 bg-red-100 text-red-800 rounded-md text-sm">{error}</div>}
@@ -300,7 +326,7 @@ export default function SimulationForm({
               value={selectedDamId}
               onChange={handleDamChange}
             >
-              <option value="">-- Ponto Customizado (Novo - Clique no Mapa) --</option>
+              {simType === "drenagem" && <option value="">-- Ponto Customizado (Novo - Clique no Mapa) --</option>}
               <optgroup label="Barragens Cadastradas">
                 {barragens.map((dam) => (
                   <option key={dam.id} value={dam.id}>
@@ -308,7 +334,7 @@ export default function SimulationForm({
                   </option>
                 ))}
               </optgroup>
-              {customPoints.length > 0 && (
+              {simType === "drenagem" && customPoints.length > 0 && (
                 <optgroup label="Pontos Personalizados (Anteriores)">
                   {customPoints.map((pt, idx) => (
                     <option key={`custom-${idx}`} value={`custom_${pt.latitude}_${pt.longitude}_${pt.dam_name}`}>
@@ -320,7 +346,7 @@ export default function SimulationForm({
             </select>
           </div>
 
-          {(selectedDamId === "" || selectedDamId.startsWith("custom_")) && (
+          {simType === "drenagem" && (selectedDamId === "" || selectedDamId.startsWith("custom_")) && (
             <div>
               <label className="block text-sm font-medium text-gray-700">Nome do Ponto Personalizado</label>
               <input 
@@ -346,7 +372,7 @@ export default function SimulationForm({
               style={{ height: "100%", width: "100%" }}
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <MapClickHandler onClick={handleMapClick} />
+              {simType === "drenagem" && <MapClickHandler onClick={handleMapClick} />}
               {lat !== "" && lng !== "" && (
                 <Marker position={[lat as number, lng as number]} icon={customIcon} />
               )}
@@ -369,6 +395,20 @@ export default function SimulationForm({
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-700">2. Parâmetros da Simulação</h4>
           
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Turno da Simulação</label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2">
+                <input type="radio" name="time_of_day" value="Dia" checked={timeOfDay === "Dia"} onChange={(e) => setTimeOfDay(e.target.value)} className="text-secondary focus:ring-secondary" />
+                <span className="text-sm text-gray-700">Dia</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input type="radio" name="time_of_day" value="Noite" checked={timeOfDay === "Noite"} onChange={(e) => setTimeOfDay(e.target.value)} className="text-secondary focus:ring-secondary" />
+                <span className="text-sm text-gray-700">Noite</span>
+              </label>
+            </div>
+          </div>
+          
           {simType === "barragem" && (
             <>
               <div>
@@ -379,6 +419,8 @@ export default function SimulationForm({
                   onChange={(e) => setRuptureType(e.target.value)}
                 >
                   <option value="Overtopping (Galgamento)">Overtopping (Galgamento)</option>
+                  <option value="Escorregamento de talude">Escorregamento de talude</option>
+                  <option value="Liquefação">Liquefação</option>
                   <option value="Piping (Piping interno)">Piping (Piping interno)</option>
                   <option value="Falha Estrutural">Falha Estrutural</option>
                   <option value="Outro">Outro...</option>
@@ -460,14 +502,16 @@ export default function SimulationForm({
               {/* Box de Imagem */}
               <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 flex flex-col justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">📸 Fotos / Mapas (Imagens)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5"><ImageIcon className="w-4 h-4" /> Fotos / Mapas (Imagens)</label>
                   <input 
                     type="file" 
                     accept="image/*"
                     multiple
                     onChange={(e) => {
                       if (e.target.files) {
-                        setImageFiles(Array.from(e.target.files));
+                        const files = Array.from(e.target.files);
+                        setImageFiles(files);
+                        setNewImageTitles(new Array(files.length).fill(""));
                       }
                     }}
                     className="block w-full text-sm text-gray-500
@@ -479,18 +523,55 @@ export default function SimulationForm({
                     "
                   />
                   {imageFiles.length > 0 && (
-                    <p className="text-xs text-blue-600 mt-2 font-medium">{imageFiles.length} arquivo(s) selecionado(s) pronto(s) para envio.</p>
+                    <div className="mt-4 space-y-3">
+                      <h5 className="text-sm font-semibold text-gray-800">Títulos das Novas Imagens:</h5>
+                      {imageFiles.map((file, idx) => (
+                        <div key={idx}>
+                          <label className="block text-xs font-medium text-gray-600 truncate">{file.name}</label>
+                          <input 
+                            type="text" 
+                            placeholder="Ex: Mapa de Mancha de Inundação" 
+                            value={newImageTitles[idx] || ""} 
+                            onChange={(e) => {
+                              const arr = [...newImageTitles];
+                              arr[idx] = e.target.value;
+                              setNewImageTitles(arr);
+                            }}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-1.5 border text-sm"
+                          />
+                        </div>
+                      ))}
+                    </div>
                   )}
                   {imageUrls.length > 0 && (
-                    <div className="mt-3 bg-white p-2 border border-gray-200 rounded-md">
-                      <p className="text-xs text-green-700 font-medium mb-2">✅ {imageUrls.length} imagem(ns) já salva(s) na nuvem.</p>
-                      <button 
-                        type="button" 
-                        onClick={() => setImageUrls([])} 
-                        className="text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded"
-                      >
-                        Apagar Todas as Salvas
-                      </button>
+                    <div className="mt-3 bg-white p-3 border border-gray-200 rounded-md space-y-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-xs text-green-700 font-medium flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> {imageUrls.length} imagem(ns) já salva(s).</p>
+                        <button 
+                          type="button" 
+                          onClick={() => { setImageUrls([]); setExistingImageTitles([]); }} 
+                          className="text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded"
+                        >
+                          Apagar Todas
+                        </button>
+                      </div>
+                      
+                      {imageUrls.map((url, idx) => (
+                        <div key={idx} className="flex flex-col gap-1 border-t pt-2">
+                          <label className="text-xs font-medium text-gray-600 truncate">Imagem {idx + 1}</label>
+                          <input 
+                            type="text" 
+                            placeholder="Título da imagem salva" 
+                            value={existingImageTitles[idx] || ""} 
+                            onChange={(e) => {
+                              const arr = [...existingImageTitles];
+                              arr[idx] = e.target.value;
+                              setExistingImageTitles(arr);
+                            }}
+                            className="block w-full rounded-md border-gray-300 shadow-sm p-1.5 border text-sm"
+                          />
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -499,7 +580,7 @@ export default function SimulationForm({
               {/* Box de Vídeo */}
               <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 flex flex-col justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">🎥 Entrevista / Explicação (Vídeo)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5"><Video className="w-4 h-4" /> Entrevista / Explicação (Vídeo)</label>
                   <input 
                     type="url" 
                     value={videoUrl} 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Lock, LogOut, MapPin, Activity, Pencil, Trash2 } from "lucide-react";
+import { Lock, LogOut, MapPin, Activity, Pencil, Trash2, Paperclip } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import dynamic from "next/dynamic";
 
@@ -15,7 +15,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   
-  const [activeTab, setActiveTab] = useState<"relatos" | "simulacoes">("relatos");
+  const [activeTab, setActiveTab] = useState<"relatos" | "simulacoes">("simulacoes");
   
   // Relatos State
   const [reports, setReports] = useState<any[]>([]);
@@ -384,7 +384,7 @@ export default function AdminPage() {
                         
                         {sim.media_url && (
                           <div className="mt-2 text-xs font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 w-fit px-3 py-1.5 rounded-lg border border-purple-100 dark:border-purple-800/30">
-                            📎 Contém Mídia Anexada
+                            <Paperclip className="w-3.5 h-3.5 inline mr-1" /> Contém Mídia Anexada
                           </div>
                         )}
                         

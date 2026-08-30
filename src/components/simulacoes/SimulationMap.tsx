@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapPin, BarChart2, Search } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -140,10 +141,10 @@ export default function SimulationMap({
 
                 <div style={{ marginBottom: 10 }}>
                   <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span>📍</span> Coord: {firstSim.latitude.toFixed(4)}, {firstSim.longitude.toFixed(4)}
+                    <MapPin size={14} /> Coord: {firstSim.latitude.toFixed(4)}, {firstSim.longitude.toFixed(4)}
                   </p>
                   <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span>📊</span> Simulações: {group.length} cenário(s)
+                    <BarChart2 size={14} /> Simulações: {group.length} cenário(s)
                   </p>
                 </div>
 
@@ -171,7 +172,7 @@ export default function SimulationMap({
                   onMouseEnter={(e) => (e.currentTarget.style.background = hoverColor)}
                   onMouseLeave={(e) => (e.currentTarget.style.background = isSelected ? hoverColor : mainColor)}
                 >
-                  🔬 Ver Resultados
+                  <Search size={14} /> Ver Resultados
                 </button>
               </div>
             </Popup>

@@ -3,6 +3,9 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { MapPin, ArrowRight, Monitor, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { barragens } from "@/data/barragens";
 
 /* Importação dinâmica — Leaflet não funciona com SSR */
 const PiauiMap = dynamic(() => import("@/components/map/PiauiMap"), {
@@ -18,6 +21,18 @@ const PiauiMap = dynamic(() => import("@/components/map/PiauiMap"), {
 });
 
 export default function MapPreview() {
+  const [simulationsCount, setSimulationsCount] = useState(0);
+
+  useEffect(() => {
+    const fetchSimCount = async () => {
+      const { count } = await supabase
+        .from("simulations")
+        .select("*", { count: "exact", head: true });
+      if (count !== null) setSimulationsCount(count);
+    };
+    fetchSimCount();
+  }, []);
+
   return (
     <section className="py-16 sm:py-24 bg-bg-secondary dark:bg-slate-900 transition-colors duration-500" id="map-preview-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,9 +58,9 @@ export default function MapPreview() {
                   <span className="w-3.5 h-3.5 rounded-full bg-secondary/80 shadow-sm" />
                   <span className="w-3.5 h-3.5 rounded-full bg-alert-green/80 shadow-sm" />
                 </div>
-                <span className="text-white/70 dark:text-gray-400 text-xs sm:text-sm font-semibold tracking-wide ml-3">
-                  UFPI !AVISA! — Painel de Monitoramento
-                </span>
+                <h3 className="text-white/70 dark:text-gray-400 text-xs sm:text-sm font-semibold tracking-wide ml-3">
+                  !Lasidra Avisa! — Painel de Monitoramento
+                </h3>
               </div>
               <div className="hidden sm:flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full">
                 <span className="w-2 h-2 rounded-full bg-alert-green animate-pulse" />
@@ -93,13 +108,13 @@ export default function MapPreview() {
                     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg px-5 py-3 flex items-center gap-3 border border-border-light dark:border-slate-700">
                       <span className="w-2.5 h-2.5 rounded-full bg-alert-red shadow-sm" />
                       <span className="text-xs sm:text-sm font-bold text-text-primary dark:text-white">
-                        6 Barragens
+                        {barragens.length} Barragens
                       </span>
                     </div>
                     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg px-5 py-3 flex items-center gap-3 border border-border-light dark:border-slate-700">
                       <span className="w-2.5 h-2.5 rounded-full bg-alert-blue shadow-sm" />
                       <span className="text-xs sm:text-sm font-bold text-text-primary dark:text-white">
-                        3 Drenagens
+                        {simulationsCount} Simulações
                       </span>
                     </div>
                     <div className="hidden sm:flex bg-white dark:bg-slate-900 rounded-xl shadow-lg px-5 py-3 items-center gap-3 border border-border-light dark:border-slate-700">

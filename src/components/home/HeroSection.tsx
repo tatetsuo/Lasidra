@@ -46,10 +46,10 @@ export default function HeroSection() {
         </div>
 
         {/* Title */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 animate-fade-in-up stagger-1 tracking-tight drop-shadow-md">
-          UFPI{" "}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] animate-fade-in-up mb-6">
+          Bem-vindo ao Portal <br className="hidden sm:block" />
           <span className="text-secondary dark:text-blue-400 relative inline-block">
-            !AVISA!
+            !Lasidra Avisa!
             <span className="absolute -bottom-2 left-0 right-0 h-1 bg-secondary/40 dark:bg-blue-500/40 rounded-full" />
           </span>
         </h1>

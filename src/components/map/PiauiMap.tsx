@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapPin, Waves, Tag } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
 import { barragens, statusColor } from "@/data/barragens";
 import { supabase } from "@/lib/supabase";
-import ReportForm from "../reports/ReportForm";
 
 /* Ícone customizado vermelho para as barragens */
 const redIcon = new L.DivIcon({
@@ -38,19 +38,9 @@ const blueIcon = new L.DivIcon({
   popupAnchor: [0, -14],
 });
 
-// Componente para capturar cliques no mapa
-function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
-  useMapEvents({
-    click(e) {
-      onClick(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-}
 
 export default function PiauiMap() {
   const [reports, setReports] = useState<any[]>([]);
-  const [newReportLocation, setNewReportLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const fetchReports = async () => {
     const { data, error } = await supabase.from("reports").select("*");
@@ -62,19 +52,6 @@ export default function PiauiMap() {
   useEffect(() => {
     fetchReports();
   }, []);
-
-  const handleMapClick = (lat: number, lng: number) => {
-    setNewReportLocation({ lat, lng });
-  };
-
-  const handleCloseForm = () => {
-    setNewReportLocation(null);
-  };
-
-  const handleSuccessForm = () => {
-    setNewReportLocation(null);
-    fetchReports();
-  };
 
   return (
     <>
@@ -90,8 +67,6 @@ export default function PiauiMap() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <MapClickHandler onClick={handleMapClick} />
-
         {/* Marcadores de Barragens */}
         {barragens.map((dam) => (
           <Marker key={dam.id} position={[dam.lat, dam.lng]} icon={redIcon}>
@@ -100,26 +75,12 @@ export default function PiauiMap() {
                 <h3 style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: 700, color: "#1A1A2E" }}>
                   {dam.nome}
                 </h3>
-                <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#4A5568" }}>📍 {dam.municipio}</p>
-                <p style={{ margin: "0 0 6px 0", fontSize: "12px", color: "#4A5568" }}>🌊 {dam.rio}</p>
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    padding: "2px 8px",
-                    borderRadius: "9999px",
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    color: statusColor(dam.status),
-                    backgroundColor: `${statusColor(dam.status)}15`,
-                  }}
-                >
-                  <span
-                    style={{ width: 6, height: 6, borderRadius: "50%", background: statusColor(dam.status), display: "inline-block" }}
-                  />
-                  {dam.status}
-                </span>
+                <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "4px" }}>
+                  <MapPin size={12} /> {dam.municipio}
+                </p>
+                <p style={{ margin: "0 0 6px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "4px" }}>
+                  <Waves size={12} /> {dam.rio}
+                </p>
               </div>
             </Popup>
           </Marker>
@@ -133,8 +94,8 @@ export default function PiauiMap() {
                 <h3 style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: 700, color: "#1A1A2E" }}>
                   {report.title}
                 </h3>
-                <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#4A5568" }}>
-                  🏷️ {report.category}
+                <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#4A5568", display: "flex", alignItems: "center", gap: "4px" }}>
+                  <Tag size={12} /> {report.category}
                 </p>
                 <p style={{ margin: "0 0 6px 0", fontSize: "12px", color: "#4A5568" }}>
                   {report.description}
@@ -158,15 +119,6 @@ export default function PiauiMap() {
           </Marker>
         ))}
       </MapContainer>
-
-      {newReportLocation && (
-        <ReportForm
-          latitude={newReportLocation.lat}
-          longitude={newReportLocation.lng}
-          onClose={handleCloseForm}
-          onSuccess={handleSuccessForm}
-        />
-      )}
     </>
   );
 }

@@ -13,8 +13,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "UFPI !AVISA! — Portal de Avisos Meteorológicos e Simulações",
-    template: "%s | UFPI !AVISA!",
+    default: "!Lasidra Avisa! — Portal de Avisos Meteorológicos e Simulações",
+    template: "%s | !Lasidra Avisa!",
   },
   description:
     "Portal de avisos meteorológicos, simulações hidrológicas e alertas de desastres naturais do laboratório Lasidra — Universidade Federal do Piauí (UFPI).",
@@ -31,10 +31,10 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Lasidra — UFPI" }],
   openGraph: {
-    title: "UFPI !AVISA! — Portal de Avisos Meteorológicos e Simulações",
+    title: "!Lasidra Avisa! — Portal de Avisos Meteorológicos e Simulações",
     description:
-      "Simulações hidrológicas e alertas de desastres naturais do Lasidra/UFPI.",
-    type: "website",
+      "Portal oficial do laboratório Lasidra da UFPI para monitoramento de desastres naturais, inundações, secas e simulações hidrológicas no estado do Piauí.",
+    url: "https://lasidra.ufpi.br",
     locale: "pt_BR",
   },
 };

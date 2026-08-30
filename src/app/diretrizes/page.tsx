@@ -4,7 +4,7 @@ import { Scale, FileText, ShieldCheck, AlertTriangle } from "lucide-react";
 export const metadata: Metadata = {
   title: "Diretrizes de Uso e Direitos Autorais",
   description:
-    "Termos de uso, política de privacidade e direitos autorais do portal UFPI !AVISA! do laboratório Lasidra.",
+    "Termos de uso, política de privacidade e direitos autorais do portal !Lasidra Avisa! do laboratório Lasidra.",
 };
 
 export default function DiretrizesPage() {
@@ -20,8 +20,8 @@ export default function DiretrizesPage() {
             Diretrizes de Uso e Direitos Autorais
           </h1>
           <p className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Termos e condições para utilização dos dados, simulações e conteúdos
-            disponibilizados pelo portal UFPI !AVISA!.
+            Consulte as informações legais e os termos de uso dos dados
+            disponibilizados pelo portal !Lasidra Avisa!.
           </p>
         </div>
       </section>
@@ -37,7 +37,7 @@ export default function DiretrizesPage() {
                 Aviso Importante
               </h2>
               <p className="text-sm text-text-secondary dark:text-gray-400 leading-relaxed">
-                Ao acessar e utilizar o portal UFPI !AVISA! e suas simulações,
+                Ao acessar e utilizar o portal !Lasidra Avisa! e suas simulações,
                 você concorda com os termos e condições descritos abaixo. Leia
                 atentamente antes de prosseguir.
               </p>
@@ -61,12 +61,10 @@ export default function DiretrizesPage() {
                   <strong className="text-text-primary dark:text-gray-200">
                     1.1. Aceitação dos Termos.
                   </strong>{" "}
-                  O acesso e a utilização do portal UFPI !AVISA!, incluindo
-                  todas as simulações hidrológicas, mapas, dados e conteúdos
-                  disponibilizados, estão condicionados à aceitação integral
-                  destes Termos de Uso. Ao acessar o portal, o usuário declara
-                  ter lido, compreendido e aceito todas as condições aqui
-                  estabelecidas.
+                  O acesso e a utilização do portal !Lasidra Avisa!, incluindo
+                  simulações, mapas, e relatos, estão sujeitos à aceitação
+                  integral destas diretrizes. O uso contínuo implica na
+                  concordância com as regras aqui estabelecidas.
                 </p>
                 <p>
                   <strong className="text-text-primary dark:text-gray-200">
@@ -128,12 +126,11 @@ export default function DiretrizesPage() {
                   <strong className="text-text-primary dark:text-gray-200">
                     2.1. Titularidade.
                   </strong>{" "}
-                  Todo o conteúdo disponibilizado no portal UFPI !AVISA! —
-                  incluindo, mas não se limitando a, textos, imagens, mapas,
-                  simulações, algoritmos, bases de dados e elementos gráficos —
-                  é de propriedade intelectual do Lasidra e da Universidade
-                  Federal do Piauí (UFPI), protegido pela legislação brasileira
-                  de direitos autorais (Lei nº 9.610/1998) e pela legislação de
+                  Todo o conteúdo disponibilizado no portal !Lasidra Avisa! —
+                  incluindo, mas não se limitando a, modelos de simulação,
+                  bases de dados cartográficas, layouts, textos e imagens — é de
+                  propriedade exclusiva do laboratório Lasidra/UFPI, sendo
+                  protegido pela legislação de direitos autorais e de
                   propriedade intelectual aplicável.
                 </p>
                 <p>
@@ -145,7 +142,7 @@ export default function DiretrizesPage() {
                   incluir a seguinte citação:
                 </p>
                 <div className="bg-bg-secondary dark:bg-slate-800 rounded-lg p-4 border border-border-light dark:border-slate-700 font-mono text-xs text-text-primary dark:text-gray-300">
-                  LASIDRA/UFPI. Portal UFPI !AVISA! — Simulações Hidrológicas e
+                  LASIDRA/UFPI. Portal !Lasidra Avisa! — Simulações Hidrológicas e
                   Alertas Meteorológicos. Universidade Federal do Piauí,
                   Teresina, PI. Disponível em: [URL]. Acesso em: [data].
                 </div>
@@ -265,7 +262,7 @@ export default function DiretrizesPage() {
                 Ao utilizar o portal, você concorda
               </h3>
               <p className="text-xs text-text-secondary dark:text-gray-400 leading-relaxed">
-                A utilização contínua do portal UFPI !AVISA! após a publicação
+                A utilização contínua do portal !Lasidra Avisa! após a publicação
                 de quaisquer alterações nestes termos constitui aceitação dessas
                 alterações. Recomendamos que você revise periodicamente esta
                 página.

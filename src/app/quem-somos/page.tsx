@@ -109,7 +109,7 @@ export default function QuemSomosPage() {
             </p>
             <p>
               Através do portal{" "}
-              <strong className="text-secondary dark:text-alert-orange">UFPI !AVISA!</strong>, o
+              <strong className="text-secondary dark:text-alert-orange">!Lasidra Avisa!</strong>, o
               laboratório disponibiliza ao público simulações hidrológicas,
               alertas meteorológicos e dados de mapeamento de áreas de risco,
               contribuindo para a cultura de prevenção e resiliência da
