@@ -68,7 +68,7 @@ export default function SimulationForm({
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [customPointName, setCustomPointName] = useState("");
   const [customPoints, setCustomPoints] = useState<any[]>([]);
-  const [timeOfDay, setTimeOfDay] = useState("Dia");
+  const [timeOfDay, setTimeOfDay] = useState("Dia de Sol");
   const [existingImageTitles, setExistingImageTitles] = useState<string[]>([]);
   const [newImageTitles, setNewImageTitles] = useState<string[]>([]);
   const [existingSimulations, setExistingSimulations] = useState<any[]>([]);
@@ -125,7 +125,7 @@ export default function SimulationForm({
       setOthers(initialData.others || "");
       setMediaUrl(initialData.media_url || "");
       setVideoUrl(initialData.video_url || "");
-      setTimeOfDay(initialData.time_of_day || "Dia");
+      setTimeOfDay(initialData.time_of_day || "Dia de Sol");
       
       // Migrate legacy media_url to image_urls if applicable
       let initImageUrls = initialData.image_urls || [];
@@ -395,19 +395,21 @@ export default function SimulationForm({
         <div className="space-y-4">
           <h4 className="font-semibold text-gray-700">2. Parâmetros da Simulação</h4>
           
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Turno da Simulação</label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2">
-                <input type="radio" name="time_of_day" value="Dia" checked={timeOfDay === "Dia"} onChange={(e) => setTimeOfDay(e.target.value)} className="text-secondary focus:ring-secondary" />
-                <span className="text-sm text-gray-700">Dia</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="time_of_day" value="Noite" checked={timeOfDay === "Noite"} onChange={(e) => setTimeOfDay(e.target.value)} className="text-secondary focus:ring-secondary" />
-                <span className="text-sm text-gray-700">Noite</span>
-              </label>
+          {simType === "barragem" && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Condição Climática</label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="time_of_day" value="Dia de Sol" checked={timeOfDay === "Dia de Sol"} onChange={(e) => setTimeOfDay(e.target.value)} className="text-secondary focus:ring-secondary" />
+                  <span className="text-sm text-gray-700">Dia de Sol</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="time_of_day" value="Dia de Chuva" checked={timeOfDay === "Dia de Chuva"} onChange={(e) => setTimeOfDay(e.target.value)} className="text-secondary focus:ring-secondary" />
+                  <span className="text-sm text-gray-700">Dia de Chuva</span>
+                </label>
+              </div>
             </div>
-          </div>
+          )}
           
           {simType === "barragem" && (
             <>
