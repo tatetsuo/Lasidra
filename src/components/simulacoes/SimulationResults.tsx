@@ -334,10 +334,12 @@ export default function SimulationResults({
               <div className="flex items-center gap-2">
                 <h3 className="text-lg sm:text-xl font-bold text-text-primary flex items-center gap-2">
                   {sim.dam_name ? sim.dam_name : "Ponto de Simulação Customizado"}
-                  {sim.time_of_day === "Noite" ? (
-                    <span className="flex items-center gap-1 text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full"><Moon className="w-3.5 h-3.5" /> Noite</span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-xs font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full"><Sun className="w-3.5 h-3.5" /> Dia</span>
+                  {!isDrenagem && (
+                    sim.time_of_day === "Dia de Chuva" || sim.time_of_day === "Noite" ? (
+                      <span className="flex items-center gap-1 text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full"><CloudRain className="w-3.5 h-3.5" /> Dia de Chuva</span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full"><Sun className="w-3.5 h-3.5" /> Dia de Sol</span>
+                    )
                   )}
                 </h3>
                 <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${isDrenagem ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
