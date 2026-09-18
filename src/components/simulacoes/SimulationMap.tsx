@@ -7,8 +7,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
-import { supabase } from "@/lib/supabase";
-
+import "leaflet-defaulticon-compatibility";
+import { getSimulations } from "@/actions/simulations";
 /* Ícone customizado vermelho para barragens */
 const redIcon = new L.DivIcon({
   className: "custom-dam-marker",
@@ -50,8 +50,8 @@ export default function SimulationMap({
 
   useEffect(() => {
     const fetchSimulations = async () => {
-      const { data, error } = await supabase.from("simulations").select("*");
-      if (!error && data) {
+      const data = await getSimulations();
+      if (data) {
         setSimulations(data);
       }
     };

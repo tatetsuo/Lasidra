@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Instagram, ExternalLink, BarChart3 } from "lucide-react";
+import { Instagram, ExternalLink } from "lucide-react";
 
 const banners = [
   {
@@ -32,67 +32,70 @@ const banners = [
 
 export default function InstitutionalBanners() {
   return (
-    <section className="py-16 sm:py-24 bg-bg-secondary dark:bg-slate-900 transition-colors duration-500" id="institutional-banners-section">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Section header */}
-      <div className="text-center mb-16">
-        <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary dark:text-blue-400 bg-primary-50 dark:bg-blue-900/30 px-4 py-1.5 rounded-full mb-4">
-          <BarChart3 className="w-4 h-4" />
-          Tecnologia & Pesquisa
-        </span>
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary dark:text-white mb-4 tracking-tight">
-          Ferramentas e Infraestrutura
-        </h2>
-        <p className="text-text-secondary dark:text-gray-400 text-base sm:text-lg max-w-2xl mx-auto font-medium">
-          Conheça as tecnologias e a infraestrutura que o Lasidra utiliza para
-          monitorar e prever desastres naturais no Piauí.
-        </p>
-      </div>
+    <section
+      className="py-20 sm:py-28 bg-bg-secondary dark:bg-slate-900 transition-colors duration-300"
+      id="institutional-banners-section"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      {/* Banners grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-16">
-        {banners.map((banner) => (
-          <div
-            key={banner.id}
-            className="group relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl dark:shadow-none dark:hover:shadow-[0_10px_40px_rgba(37,99,235,0.2)] transition-all duration-500 hover:-translate-y-2 border border-border-light/50 dark:border-slate-800"
-            id={`banner-${banner.id}`}
-          >
-            <Image
-              src={banner.image}
-              alt={banner.title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            />
-
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
-
-            {/* Content */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-              <h3 className="text-white font-bold text-lg sm:text-xl mb-2 drop-shadow-md">
-                {banner.title}
-              </h3>
-              <p className="text-gray-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                {banner.description}
-              </p>
-            </div>
+        {/* Cabeçalho de seção — editorial */}
+        <div className="mb-14">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="section-divider" />
+            <span className="eyebrow">Tecnologia & Pesquisa</span>
           </div>
-        ))}
-      </div>
+          <h2 className="text-display-md text-text-primary dark:text-white">
+            Ferramentas e Infraestrutura
+          </h2>
+          <p className="text-text-secondary dark:text-slate-400 text-sm max-w-md leading-relaxed mt-3">
+            Conheça as tecnologias e a infraestrutura que o Lasidra utiliza para monitorar e prever desastres naturais no Piauí.
+          </p>
+        </div>
 
-      {/* Instagram CTA */}
-      <div className="text-center">
-        <div className="inline-flex flex-col sm:flex-row items-center gap-6 bg-white dark:bg-slate-800 rounded-3xl shadow-xl dark:shadow-2xl border border-border-light dark:border-slate-700 p-8 sm:px-12 sm:py-8 transition-colors duration-500 hover:-translate-y-1 hover:shadow-2xl">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white shadow-lg shadow-pink-500/20">
-              <Instagram className="w-7 h-7" />
+ /*       {/* Grid de imagens */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-16">
+          {banners.map((banner) => (
+            <div
+              key={banner.id}
+              className="group relative aspect-[4/3] rounded-lg overflow-hidden border border-border-light dark:border-slate-800 hover:border-border dark:hover:border-slate-700 transition-all duration-300"
+              id={`banner-${banner.id}`}
+            >
+              <Image
+                src={banner.image}
+                alt={banner.title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              />
+
+              {/* Overlay mais natural */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+              {/* Conteúdo */}
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <h3 className="text-white font-semibold text-sm mb-1">
+                  {banner.title}
+                </h3>
+                <p className="text-white/60 text-xs leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {banner.description}
+                </p>
+              </div>
             </div>
-            <div className="text-left">
-              <p className="text-base sm:text-lg font-bold text-text-primary dark:text-white">
+          ))}
+        </div>
+        */
+
+        {/* Instagram CTA — design clean e integrado */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 p-6 sm:p-8 rounded-xl border border-border-light dark:border-slate-800 bg-white dark:bg-slate-900/80">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white shrink-0">
+              <Instagram className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-text-primary dark:text-white">
                 Siga-nos no Instagram
               </p>
-              <p className="text-sm text-text-secondary dark:text-gray-400 font-medium">
+              <p className="text-xs text-text-muted dark:text-slate-500 mt-0.5">
                 Acompanhe novidades e alertas do Lasidra
               </p>
             </div>
@@ -101,15 +104,14 @@ export default function InstitutionalBanners() {
             href="https://www.instagram.com/lasidra_ufpi"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary hover:bg-primary-light dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-all duration-300 shadow-md hover:shadow-lg w-full sm:w-auto mt-4 sm:mt-0"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-light dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-medium rounded-lg text-sm transition-all duration-200 w-full sm:w-auto justify-center border border-transparent dark:border-slate-700"
             id="instagram-cta"
           >
             @lasidra_ufpi
-            <ExternalLink className="w-4 h-4 opacity-70" />
+            <ExternalLink className="w-3.5 h-3.5 opacity-60" />
           </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
   );
 }

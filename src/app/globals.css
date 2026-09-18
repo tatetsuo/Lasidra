@@ -3,7 +3,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================
-   !Lasidra Avisa! — Design System
+   Lasidra — Design System
    Paleta Institucional UFPI + Lasidra
    ============================================ */
 
@@ -24,29 +24,29 @@
   --color-primary-900: #001122;
 
   /* Secondary — Dourado/Âmbar */
-  --color-secondary: #D4A017;
-  --color-secondary-light: #F0C850;
-  --color-secondary-dark: #B8860B;
+  --color-secondary: #C8960F;
+  --color-secondary-light: #E8B830;
+  --color-secondary-dark: #A07A0A;
   --color-secondary-50: #FDF8E8;
   --color-secondary-100: #F9ECBB;
   --color-secondary-200: #F5E08E;
   --color-secondary-300: #F0D461;
   --color-secondary-400: #ECC834;
-  --color-secondary-500: #D4A017;
-  --color-secondary-600: #B8860B;
-  --color-secondary-700: #8B6508;
-  --color-secondary-800: #5E4406;
-  --color-secondary-900: #312303;
+  --color-secondary-500: #C8960F;
+  --color-secondary-600: #A07A0A;
+  --color-secondary-700: #7A5C07;
+  --color-secondary-800: #524004;
+  --color-secondary-900: #2A2002;
 
   /* Neutrals */
-  --color-bg-primary: #FFFFFF;
-  --color-bg-secondary: #F5F7FA;
-  --color-bg-tertiary: #E8ECF1;
-  --color-text-primary: #1A1A2E;
-  --color-text-secondary: #4A5568;
-  --color-text-muted: #718096;
-  --color-border: #D1D5DB;
-  --color-border-light: #E5E7EB;
+  --color-bg-primary: #FAFAFA;
+  --color-bg-secondary: #F4F6F9;
+  --color-bg-tertiary: #E8ECF2;
+  --color-text-primary: #0F1923;
+  --color-text-secondary: #475569;
+  --color-text-muted: #8898AA;
+  --color-border: #D4D8DF;
+  --color-border-light: #E8EBF0;
 
   /* Alerts */
   --color-alert-red: #DC2626;
@@ -54,15 +54,15 @@
   --color-alert-green: #16A34A;
   --color-alert-blue: #2563EB;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  --shadow-header: 0 2px 8px rgba(0, 51, 102, 0.08);
+  /* Shadows — mais realistas */
+  --shadow-sm: 0 1px 3px 0 rgba(15, 25, 35, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(15, 25, 35, 0.08);
+  --shadow-lg: 0 12px 24px -4px rgba(15, 25, 35, 0.10);
+  --shadow-xl: 0 24px 40px -8px rgba(15, 25, 35, 0.12);
+  --shadow-header: 0 1px 0 0 rgba(15, 25, 35, 0.08);
 
   /* Radius */
-  --radius-sm: 0.375rem;
+  --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
@@ -70,8 +70,8 @@
 
   /* Transitions */
   --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 350ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
 }
 
 /* ============================================
@@ -87,17 +87,65 @@ body {
   background-color: var(--color-bg-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ============================================
-   Animations
+   Tipografia — Utilitários com Sora
+   ============================================ */
+
+.font-display {
+  font-family: var(--font-sora), var(--font-inter), system-ui, sans-serif;
+}
+
+.text-display-xl {
+  font-family: var(--font-sora), var(--font-inter), system-ui, sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.text-display-lg {
+  font-family: var(--font-sora), var(--font-inter), system-ui, sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.text-display-md {
+  font-family: var(--font-sora), var(--font-inter), system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* Eyebrow text — substitui os pills/badges genéricos */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.eyebrow-primary {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+}
+
+/* ============================================
+   Animations — mais discretas
    ============================================ */
 
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -106,18 +154,14 @@ body {
 }
 
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slide-in-right {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(16px);
   }
   to {
     opacity: 1;
@@ -125,60 +169,50 @@ body {
   }
 }
 
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(212, 160, 23, 0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
   }
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
+  animation: fade-in-up 0.5s ease-out forwards;
+  opacity: 0;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.5s ease-out forwards;
+  animation: fade-in 0.4s ease-out forwards;
+  opacity: 0;
 }
 
 .animate-slide-in-right {
   animation: slide-in-right 0.5s ease-out forwards;
+  opacity: 0;
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s infinite;
-}
-
-/* Stagger delays for sequential animations */
-.stagger-1 { animation-delay: 0.1s; }
-.stagger-2 { animation-delay: 0.2s; }
-.stagger-3 { animation-delay: 0.3s; }
-.stagger-4 { animation-delay: 0.4s; }
-.stagger-5 { animation-delay: 0.5s; }
+/* Stagger delays */
+.stagger-1 { animation-delay: 0.08s; }
+.stagger-2 { animation-delay: 0.16s; }
+.stagger-3 { animation-delay: 0.24s; }
+.stagger-4 { animation-delay: 0.32s; }
+.stagger-5 { animation-delay: 0.40s; }
 
 /* ============================================
    Custom Utilities
    ============================================ */
 
 .text-gradient-primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  background: linear-gradient(135deg, var(--color-secondary-light) 0%, var(--color-secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .bg-gradient-hero {
-  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%);
+  background: 
+    radial-gradient(ellipse 80% 60% at 70% -10%, rgba(0, 74, 153, 0.4) 0%, transparent 60%),
+    #002244;
 }
 
 .bg-gradient-hero-overlay {
@@ -186,18 +220,21 @@ body {
 }
 
 /* ============================================
+   Divisor Editorial
+   ============================================ */
+
+.section-divider {
+  width: 40px;
+  height: 3px;
+  background-color: var(--color-secondary);
+  border-radius: 2px;
+}
+
+/* ============================================
    Leaflet Custom Styles
    ============================================ */
 
-/* Remove default DivIcon background */
 .custom-dam-marker {
   background: none !important;
   border: none !important;
-}
-
-@keyframes ping {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
-  }
 }

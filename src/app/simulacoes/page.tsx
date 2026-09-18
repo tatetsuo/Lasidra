@@ -1,20 +1,19 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import dynamic from "next/dynamic";
-import { FlaskConical, Loader2 } from "lucide-react";
+import { Droplets, Loader2, MapPin } from "lucide-react";
 import SimulationResults from "@/components/simulacoes/SimulationResults";
 import AgreementModal from "@/components/simulacoes/AgreementModal";
 
-/* Importação dinâmica — Leaflet não funciona com SSR */
 const SimulationMap = dynamic(
   () => import("@/components/simulacoes/SimulationMap"),
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center h-full bg-bg-tertiary dark:bg-slate-800">
+      <div className="flex items-center justify-center h-full bg-bg-secondary dark:bg-slate-900">
         <div className="flex flex-col items-center gap-3 text-text-muted dark:text-gray-400">
-          <Loader2 className="w-8 h-8 animate-spin text-primary/40 dark:text-blue-500/40" />
+          <Loader2 className="w-7 h-7 animate-spin text-primary/30 dark:text-blue-500/30" />
           <span className="text-sm font-medium">Carregando mapa…</span>
         </div>
       </div>
@@ -29,7 +28,6 @@ export default function SimulacoesPage() {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const handleSelectSimulation = (group: any[]) => {
-    // Verifica se já aceitou
     const hasAgreed = localStorage.getItem("lasidra_agreed_terms") === "true";
     if (hasAgreed) {
       proceedWithSimulation(group);
@@ -41,12 +39,8 @@ export default function SimulacoesPage() {
 
   const proceedWithSimulation = (group: any[]) => {
     setSelectedSimulationGroup(group);
-    // Scroll to results after a brief delay for the animation
     setTimeout(() => {
-      resultsRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 150);
   };
 
@@ -66,40 +60,39 @@ export default function SimulacoesPage() {
 
   const handleClose = () => {
     setSelectedSimulationGroup(null);
-    // Scroll back to map
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <>
-      <AgreementModal 
-        isOpen={showModal} 
-        onAccept={handleAcceptTerms} 
-        onDecline={handleDeclineTerms} 
+      <AgreementModal
+        isOpen={showModal}
+        onAccept={handleAcceptTerms}
+        onDecline={handleDeclineTerms}
       />
 
-      {/* Hero reduzido — barra fina */}
-      <section className="bg-primary dark:bg-slate-950 py-5 sm:py-6 transition-colors duration-500 border-b border-primary-light/10 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-4">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 shrink-0">
-            <FlaskConical className="w-5 h-5 text-secondary dark:text-blue-400" />
+      {/* Hero — barra compacta e clean */}
+      <section className="bg-[#002244] dark:bg-slate-950 border-b border-white/8 dark:border-slate-800 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 flex items-center gap-4">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/8 shrink-0">
+            <Droplets className="w-4.5 h-4.5 text-secondary" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white">
+            <h1 className="text-base sm:text-lg font-bold text-white font-display">
               Simulações
             </h1>
-            <p className="text-white/60 text-xs sm:text-sm font-medium">
-              Clique em um ponto de simulação no mapa para visualizar os resultados detalhados
+            <p className="text-white/45 text-xs sm:text-sm mt-0.5">
+              Clique em um ponto de simulação no mapa para visualizar os resultados
             </p>
           </div>
         </div>
       </section>
 
-      {/* Map section */}
-      <section className="bg-bg-secondary dark:bg-slate-900 transition-colors duration-500">
+      {/* Mapa */}
+      <section className="bg-bg-secondary dark:bg-slate-900 transition-colors duration-300">
         <div
           className={`transition-all duration-500 ease-in-out ${
-            selectedSimulationGroup ? "h-[40vh]" : "h-[70vh]"
+            selectedSimulationGroup ? "h-[38vh]" : "h-[68vh]"
           }`}
         >
           <SimulationMap
@@ -109,11 +102,11 @@ export default function SimulacoesPage() {
         </div>
       </section>
 
-      {/* Simulation results */}
+      {/* Resultados */}
       {selectedSimulationGroup && (
         <section
           ref={resultsRef}
-          className="py-8 sm:py-12 bg-bg-secondary dark:bg-slate-900 transition-colors duration-500"
+          className="py-8 sm:py-12 bg-bg-secondary dark:bg-slate-900 transition-colors duration-300"
           id="simulation-results-section"
         >
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,21 +115,28 @@ export default function SimulacoesPage() {
         </section>
       )}
 
-      {/* Empty state — when no simulation selected */}
+      {/* Empty state — nenhuma simulação selecionada */}
       {!selectedSimulationGroup && (
-        <section className="py-12 sm:py-16 bg-bg-secondary dark:bg-slate-900 transition-colors duration-500 flex-1 flex flex-col items-center justify-center">
-          <div className="max-w-2xl mx-auto px-4 text-center w-full">
-            <div className="bg-white dark:bg-slate-800 rounded-3xl border border-border-light dark:border-slate-700 shadow-sm p-10 transition-colors duration-500">
-              <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-5">
-                <FlaskConical className="w-8 h-8 text-primary dark:text-blue-400" />
+        <section className="py-16 bg-bg-secondary dark:bg-slate-900 transition-colors duration-300 flex-1">
+          <div className="max-w-md mx-auto px-4 text-center">
+            <div className="w-14 h-14 rounded-xl bg-primary/8 dark:bg-primary/20 flex items-center justify-center mx-auto mb-5 border border-primary/10 dark:border-primary/30">
+              <MapPin className="w-6 h-6 text-primary dark:text-blue-400" />
+            </div>
+            <h3 className="text-base font-semibold text-text-primary dark:text-white mb-2">
+              Nenhuma simulação selecionada
+            </h3>
+            <p className="text-sm text-text-muted dark:text-slate-500 leading-relaxed">
+              Clique em um dos pontos coloridos no mapa acima para visualizar os cenários de simulação.
+            </p>
+            <div className="mt-8 flex items-center justify-center gap-6 text-xs text-text-muted dark:text-slate-600">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-alert-red shrink-0" />
+                Barragem
               </div>
-              <h3 className="text-xl font-bold text-text-primary dark:text-white mb-3">
-                Selecione uma simulação
-              </h3>
-              <p className="text-text-muted dark:text-gray-400 text-sm sm:text-base leading-relaxed max-w-md mx-auto">
-                Clique em um dos pontos no mapa acima para visualizar
-                os cenários de simulação cadastrados pelo administrador.
-              </p>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-yellow-400 shrink-0" />
+                Drenagem
+              </div>
             </div>
           </div>
         </section>

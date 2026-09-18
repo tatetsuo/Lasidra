@@ -8,7 +8,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
 import { barragens, statusColor } from "@/data/barragens";
-import { supabase } from "@/lib/supabase";
+import { getReports } from "@/actions/reports";
 
 /* Ícone customizado vermelho para as barragens */
 const redIcon = new L.DivIcon({
@@ -43,9 +43,13 @@ export default function PiauiMap() {
   const [reports, setReports] = useState<any[]>([]);
 
   const fetchReports = async () => {
-    const { data, error } = await supabase.from("reports").select("*");
-    if (!error && data) {
-      setReports(data);
+    try {
+      const data = await getReports();
+      if (data) {
+        setReports(data);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 

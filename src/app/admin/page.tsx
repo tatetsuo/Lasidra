@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Lock, LogOut, MapPin, Activity, Pencil, Trash2, Paperclip } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import dynamic from "next/dynamic";
+import { checkSession, logoutAction } from "@/actions/auth";
+import { getReports, updateReportStatus } from "@/actions/reports";
+import { getSimulations, deleteSimulation } from "@/actions/simulations";
 
 const SimulationForm = dynamic(() => import("@/components/admin/SimulationForm"), {
   ssr: false,
@@ -27,17 +29,9 @@ export default function AdminPage() {
   const [formSimType, setFormSimType] = useState<"barragem" | "drenagem">("barragem");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    checkSession().then((res) => {
+      setSession(res);
     });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -48,50 +42,68 @@ export default function AdminPage() {
   }, [session]);
 
   const fetchReports = async () => {
-    const { data, error } = await supabase.from("reports").select("*").order("created_at", { ascending: false });
-    if (!error && data) {
+    try {
+      const data = await getReports();
       setReports(data);
+    } catch(err) {
+      console.error(err);
     }
   };
 
   const fetchSimulations = async () => {
-    const { data, error } = await supabase.from("simulations").select("*").order("created_at", { ascending: false });
-    if (!error && data) {
+    try {
+      const data = await getSimulations();
       setSimulations(data);
+    } catch(err) {
+      console.error(err);
     }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) alert(error.message);
+    
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        setSession(true);
+      } else {
+        alert(data.error);
+      }
+    } catch (err) {
+      alert("Erro ao fazer login");
+    }
+    
     setLoading(false);
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setSession(null);
   };
 
-  const updateReportStatus = async (id: string, newStatus: string) => {
-    const { error } = await supabase.from("reports").update({ status: newStatus }).eq("id", id);
-    if (!error) {
+  const handleUpdateReportStatus = async (id: string, newStatus: string) => {
+    try {
+      await updateReportStatus(id, newStatus);
       fetchReports();
-    } else {
+    } catch (err) {
       alert("Erro ao atualizar status");
     }
   };
 
   const handleDeleteSimulation = async (id: string) => {
     if (confirm("Tem certeza que deseja excluir esta simulação? Esta ação não pode ser desfeita.")) {
-      const { error } = await supabase.from("simulations").delete().eq("id", id);
-      if (!error) {
+      try {
+        await deleteSimulation(id);
         fetchSimulations();
-      } else {
-        alert("Erro ao excluir simulação: " + error.message);
+      } catch (err: any) {
+        alert("Erro ao excluir simulação: " + err.message);
       }
     }
   };
@@ -233,24 +245,24 @@ export default function AdminPage() {
                       <div className="flex gap-2 mt-3">
                         {report.status !== "pendente" && (
                           <button
-                            onClick={() => updateReportStatus(report.id, "pendente")}
+                            onClick={() => handleUpdateReportStatus(report.id, "pendente")}
                             className="text-xs font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg border dark:border-slate-700 transition-colors"
                           >
-                            Pendente
+                            Marcar Pendente
                           </button>
                         )}
                         {report.status !== "em andamento" && (
                           <button
-                            onClick={() => updateReportStatus(report.id, "em andamento")}
-                            className="text-xs font-semibold bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:hover:bg-yellow-900/40 text-yellow-800 dark:text-yellow-500 px-3 py-1.5 rounded-lg border border-yellow-200 dark:border-yellow-900/50 transition-colors"
+                            onClick={() => handleUpdateReportStatus(report.id, "em andamento")}
+                            className="text-xs font-semibold bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 text-yellow-800 dark:text-yellow-400 px-3 py-1.5 rounded-lg border border-yellow-200 dark:border-yellow-900 transition-colors"
                           >
                             Em Andamento
                           </button>
                         )}
                         {report.status !== "resolvido" && (
                           <button
-                            onClick={() => updateReportStatus(report.id, "resolvido")}
-                            className="text-xs font-semibold bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 text-green-800 dark:text-green-500 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-900/50 transition-colors"
+                            onClick={() => handleUpdateReportStatus(report.id, "resolvido")}
+                            className="text-xs font-semibold bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-800 dark:text-green-400 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-900 transition-colors"
                           >
                             Resolvido
                           </button>

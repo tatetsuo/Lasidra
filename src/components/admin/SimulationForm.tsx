@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { createSimulation, updateSimulation, getSimulations } from "@/actions/simulations";
 import { barragens } from "@/data/barragens";
 import dynamic from "next/dynamic";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import { Upload, X, MapPin, Construction, CloudRain, ImageIcon, Video, CheckCircle2 } from "lucide-react";
+import { Upload, X, MapPin, Construction, CloudRain, ImageIcon, Video, CheckCircle2, Plus, Trash2, Maximize2 } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -75,23 +75,28 @@ export default function SimulationForm({
 
   useEffect(() => {
     const fetchCustomPoints = async () => {
-      const { data } = await supabase
-        .from("simulations")
-        .select("dam_name, latitude, longitude")
-        .is("dam_id", null);
-      if (data) {
-        const unique = Array.from(new Set(data.filter(d => d.dam_name).map(d => JSON.stringify({
-          dam_name: d.dam_name,
-          latitude: d.latitude,
-          longitude: d.longitude
-        })))).map(s => JSON.parse(s as string));
-        setCustomPoints(unique);
+      try {
+        const data = await getSimulations();
+        if (data) {
+          const unique = Array.from(new Set(data.filter((d: any) => !d.dam_id && d.dam_name).map((d: any) => JSON.stringify({
+            dam_name: d.dam_name,
+            latitude: d.latitude,
+            longitude: d.longitude
+          })))).map(s => JSON.parse(s as string));
+          setCustomPoints(unique);
+        }
+      } catch (e) {
+        console.error(e);
       }
     };
     fetchCustomPoints();
     const fetchExistingSims = async () => {
-      const { data } = await supabase.from("simulations").select("id, type, dam_name, rupture_type");
-      if (data) setExistingSimulations(data);
+      try {
+        const data = await getSimulations();
+        if (data) setExistingSimulations(data);
+      } catch (e) {
+        console.error(e);
+      }
     };
     fetchExistingSims();
   }, []);
@@ -209,22 +214,18 @@ export default function SimulationForm({
     if (imageFiles.length > 0) {
       try {
         const uploadPromises = imageFiles.map(async (file) => {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          const formData = new FormData();
+          formData.append('file', file);
           
-          const { error: uploadError } = await supabase.storage
-            .from('simulations')
-            .upload(fileName, file);
-            
-          if (uploadError) {
-            throw new Error(uploadError.message);
-          }
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+          });
           
-          const { data: publicUrlData } = supabase.storage
-            .from('simulations')
-            .getPublicUrl(fileName);
-            
-          return publicUrlData.publicUrl;
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Erro no upload");
+          
+          return data.url;
         });
 
         const uploadedUrls = await Promise.all(uploadPromises);
@@ -278,19 +279,14 @@ export default function SimulationForm({
 
     let dbError;
     
-    if (initialData && initialData.id) {
-      // UPDATE
-      const { error: updateError } = await supabase
-        .from("simulations")
-        .update(payload)
-        .eq("id", initialData.id);
-      dbError = updateError;
-    } else {
-      // INSERT
-      const { error: insertError } = await supabase
-        .from("simulations")
-        .insert([payload]);
-      dbError = insertError;
+    try {
+      if (initialData && initialData.id) {
+        await updateSimulation(initialData.id, payload);
+      } else {
+        await createSimulation(payload);
+      }
+    } catch (err: any) {
+      dbError = err;
     }
 
     setLoading(false);

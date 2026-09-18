@@ -7,7 +7,7 @@ import {
   Phone,
   Instagram,
   ExternalLink,
-  FlaskConical,
+  Droplets,
   Scale,
 } from "lucide-react";
 import VisitorCounter from "./VisitorCounter";
@@ -23,54 +23,53 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-primary dark:bg-slate-950 text-white transition-colors duration-500 border-t-4 border-secondary" id="footer">
-      {/* Top accent bar is now handled by border-t-4 */}
+    <footer className="bg-[#001833] dark:bg-slate-950 text-white transition-colors duration-300" id="footer">
+      {/* Linha de acento topo — mais sutil */}
+      <div className="h-px bg-gradient-to-r from-transparent via-secondary/60 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main footer content */}
-        <div className="py-12 sm:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-16">
-          {/* Column 1 — About */}
+        {/* Conteúdo principal */}
+        <div className="py-14 sm:py-16 grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-20">
+
+          {/* Coluna 1 — Sobre */}
           <div>
             <div className="flex items-center gap-2.5 mb-5">
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 text-secondary">
-                <FlaskConical className="w-5 h-5" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/8 text-secondary">
+                <Droplets className="w-4 h-4" />
               </div>
-              <div>
-                <h3 className="text-lg font-bold tracking-tight">Lasidra</h3>
-                <span className="text-[10px] font-medium text-white/60 tracking-wider uppercase">
-                  UFPI
-                </span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-base font-bold font-display">Lasidra</span>
+                <span className="text-[10px] font-medium text-white/35 tracking-widest uppercase">UFPI</span>
               </div>
             </div>
-            <p className="text-white/70 text-sm leading-relaxed mb-6">
-              Laboratório de Simulações de Drenagens e Represas da Universidade Federal do Piauí, dedicado à pesquisa em recursos hídricos, simulações hidrológicas e alertas meteorológicos.
+            <p className="text-white/50 text-sm leading-relaxed mb-6 max-w-xs">
+              Laboratório de Simulações de Drenagens e Represas da Universidade Federal do Piauí. Pesquisa em recursos hídricos e alertas meteorológicos.
             </p>
             <a
               href="https://www.instagram.com/lasidra_ufpi"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/90 hover:text-white text-sm font-medium transition-all duration-250"
+              className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors duration-150"
               id="footer-instagram"
             >
-              <Instagram className="w-4 h-4" />
+              <Instagram className="w-3.5 h-3.5" />
               @lasidra_ufpi
               <ExternalLink className="w-3 h-3 opacity-50" />
             </a>
           </div>
 
-          {/* Column 2 — Quick Links */}
+          {/* Coluna 2 — Links */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/50 mb-5">
-              Links Rápidos
+            <h3 className="text-[11px] font-semibold uppercase tracking-widest text-white/30 mb-5">
+              Navegação
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {quickLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-white/70 hover:text-secondary text-sm transition-colors duration-200 flex items-center gap-2 group"
+                    className="text-sm text-white/50 hover:text-white transition-colors duration-150"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-secondary/40 group-hover:bg-secondary transition-colors duration-200" />
                     {link.label}
                   </Link>
                 </li>
@@ -78,36 +77,35 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3 — Contact */}
+          {/* Coluna 3 — Contato */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/50 mb-5">
+            <h3 className="text-[11px] font-semibold uppercase tracking-widest text-white/30 mb-5">
               Contato
             </h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
-                <span className="text-white/70 text-sm leading-relaxed">
-                  Campus Universitário Ministro Petrônio Portella, Bairro
-                  Ininga, Teresina — PI, CEP 64049-550
+            <ul className="space-y-3.5">
+              <li className="flex items-start gap-2.5">
+                <MapPin className="w-3.5 h-3.5 text-secondary/70 mt-0.5 shrink-0" />
+                <span className="text-white/50 text-sm leading-relaxed">
+                  Campus Ministro Petrônio Portella, Ininga,<br />Teresina — PI, CEP 64049-550
                 </span>
               </li>
               <li>
                 <a
                   href="mailto:lasidra@ufpi.edu.br"
-                  className="flex items-center gap-3 text-white/70 hover:text-secondary text-sm transition-colors duration-200"
+                  className="flex items-center gap-2.5 text-white/50 hover:text-white text-sm transition-colors duration-150"
                   id="footer-email"
                 >
-                  <Mail className="w-4 h-4 text-secondary shrink-0" />
+                  <Mail className="w-3.5 h-3.5 text-secondary/70 shrink-0" />
                   lasidra@ufpi.edu.br
                 </a>
               </li>
               <li>
                 <a
                   href="tel:+558631215000"
-                  className="flex items-center gap-3 text-white/70 hover:text-secondary text-sm transition-colors duration-200"
+                  className="flex items-center gap-2.5 text-white/50 hover:text-white text-sm transition-colors duration-150"
                   id="footer-phone"
                 >
-                  <Phone className="w-4 h-4 text-secondary shrink-0" />
+                  <Phone className="w-3.5 h-3.5 text-secondary/70 shrink-0" />
                   (86) 3121-5000
                 </a>
               </li>
@@ -115,24 +113,23 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-white/10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
-            <div className="flex flex-col gap-1">
-              <p>
-                © {currentYear} Lasidra — Universidade Federal do Piauí.
-              </p>
-              <div className="flex items-center gap-2 text-white/50 hover:text-white/80 transition-colors">
-                <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">
-                  <img alt="Licença Creative Commons" style={{ borderWidth:0, height: "15px" }} src="https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png" />
+        {/* Barra inferior */}
+        <div className="border-t border-white/8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/30">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <p>© {currentYear} Lasidra — Universidade Federal do Piauí</p>
+            <div className="flex items-center gap-2">
+              <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">
+                <img alt="Licença Creative Commons" style={{ borderWidth: 0, height: "14px" }} src="https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png" />
+              </a>
+              <span>
+                <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" className="hover:text-white/60 transition-colors underline">
+                  CC BY-NC-ND 4.0
                 </a>
-                <span>Este obra está licenciado com uma Licença <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" className="underline">CC BY-NC-ND 4.0</a>.</span>
-              </div>
+              </span>
             </div>
-            {/* Botão de Direitos Autorais */}
             <Link
               href="/diretrizes"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/60 hover:text-secondary text-xs font-medium transition-all duration-250 border border-white/10 hover:border-secondary/30"
+              className="inline-flex items-center gap-1.5 text-white/30 hover:text-white/60 transition-colors duration-150"
               id="footer-copyright-btn"
             >
               <Scale className="w-3 h-3" />
@@ -141,20 +138,17 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Contador de Visitantes */}
             <VisitorCounter />
-            <p className="text-white/30">
+            <p className="text-white/25">
               Desenvolvido por{" "}
               <a
                 href="https://github.com/tatetsuo"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-white/70 transition-colors underline decoration-transparent hover:decoration-white/30"
+                className="hover:text-white/50 transition-colors underline"
               >
                 Gabriel Maia
-              </a>{" "}
-              em auxílio com o{" "}
-              <span className="text-secondary/60">LASIDRA</span>
+              </a>
             </p>
           </div>
         </div>

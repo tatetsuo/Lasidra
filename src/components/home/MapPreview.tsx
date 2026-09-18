@@ -2,19 +2,18 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { MapPin, ArrowRight, Monitor, Loader2 } from "lucide-react";
+import { getSimulationsCount } from "@/actions/reports";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { barragens } from "@/data/barragens";
 
-/* Importação dinâmica — Leaflet não funciona com SSR */
 const PiauiMap = dynamic(() => import("@/components/map/PiauiMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full bg-bg-tertiary rounded-xl">
-      <div className="flex flex-col items-center gap-3 text-text-muted">
-        <Loader2 className="w-8 h-8 animate-spin text-primary/40" />
-        <span className="text-sm font-medium">Carregando mapa…</span>
+    <div className="flex items-center justify-center h-full bg-bg-tertiary dark:bg-slate-800 rounded-lg">
+      <div className="flex flex-col items-center gap-2 text-text-muted">
+        <Loader2 className="w-6 h-6 animate-spin text-primary/30" />
+        <span className="text-xs font-medium">Carregando mapa…</span>
       </div>
     </div>
   ),
@@ -24,107 +23,101 @@ export default function MapPreview() {
   const [simulationsCount, setSimulationsCount] = useState(0);
 
   useEffect(() => {
-    const fetchSimCount = async () => {
-      const { count } = await supabase
-        .from("simulations")
-        .select("*", { count: "exact", head: true });
-      if (count !== null) setSimulationsCount(count);
-    };
-    fetchSimCount();
+    async function fetchCount() {
+      try {
+        const count = await getSimulationsCount();
+        if (count !== null) setSimulationsCount(count);
+      } catch (error) {
+        console.error("Erro ao buscar contagem de simulações:", error);
+      }
+    }
+    fetchCount();
   }, []);
 
   return (
-    <section className="py-16 sm:py-24 bg-bg-secondary dark:bg-slate-900 transition-colors duration-500" id="map-preview-section">
+    <section
+      className="py-20 sm:py-28 bg-white dark:bg-slate-950 transition-colors duration-300"
+      id="map-preview-section"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="text-center mb-12">
-          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-secondary dark:text-alert-blue bg-secondary-50 dark:bg-blue-900/30 px-4 py-1.5 rounded-full mb-4">
-            <Monitor className="w-4 h-4" />
-            Painel Interativo
-          </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary dark:text-white tracking-tight">
-            Monitoramento de Áreas Inundadas
-          </h2>
+
+        {/* Cabeçalho de seção — editorial */}
+        <div className="mb-14">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="section-divider" />
+            <span className="eyebrow">Sistema Web GIS</span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            <h2 className="text-display-md text-text-primary dark:text-white">
+              Mapa de Monitoramento
+            </h2>
+            <p className="text-text-secondary dark:text-slate-400 text-sm max-w-sm leading-relaxed">
+              Explore as áreas monitoradas pelo Lasidra e visualize os detalhes de cada simulação hidrológica.
+            </p>
+          </div>
         </div>
 
-        {/* Dashboard panel */}
-        <div className="relative max-w-5xl mx-auto">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl dark:shadow-2xl overflow-hidden border border-border-light dark:border-slate-700 transition-colors duration-500">
-            {/* Panel header bar */}
-            <div className="bg-primary dark:bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-primary-light/20 dark:border-slate-800">
-              <div className="flex items-center gap-3">
-                <div className="flex gap-2">
-                  <span className="w-3.5 h-3.5 rounded-full bg-alert-red/80 shadow-sm" />
-                  <span className="w-3.5 h-3.5 rounded-full bg-secondary/80 shadow-sm" />
-                  <span className="w-3.5 h-3.5 rounded-full bg-alert-green/80 shadow-sm" />
+        {/* Layout: texto + mapa */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
+
+          {/* Painel lateral — info + CTA */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="p-6 rounded-xl border border-border-light dark:border-slate-800 bg-bg-secondary dark:bg-slate-900">
+              <h3 className="text-base font-semibold text-text-primary dark:text-white mb-2">
+                Navegação Geográfica
+              </h3>
+              <p className="text-text-secondary dark:text-slate-400 text-sm leading-relaxed">
+                Selecione um município para visualizar áreas inundadas, cenários de ruptura de barragens e dados de macro drenagem em todo o estado do Piauí.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-4 rounded-xl border border-border-light dark:border-slate-800 bg-bg-secondary dark:bg-slate-900">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 rounded-full bg-alert-red" />
+                  <span className="text-xs text-text-muted dark:text-slate-500 uppercase tracking-wider font-medium">Barragens</span>
                 </div>
-                <h3 className="text-white/70 dark:text-gray-400 text-xs sm:text-sm font-semibold tracking-wide ml-3">
-                  !Lasidra Avisa! — Painel de Monitoramento
-                </h3>
+                <p className="text-2xl font-bold text-text-primary dark:text-white font-display">
+                  {barragens.length}
+                </p>
               </div>
-              <div className="hidden sm:flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full">
-                <span className="w-2 h-2 rounded-full bg-alert-green animate-pulse" />
-                <span className="text-white/70 text-xs font-bold">Online</span>
+              <div className="p-4 rounded-xl border border-border-light dark:border-slate-800 bg-bg-secondary dark:bg-slate-900">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2 h-2 rounded-full bg-alert-blue" />
+                  <span className="text-xs text-text-muted dark:text-slate-500 uppercase tracking-wider font-medium">Simulações</span>
+                </div>
+                <p className="text-2xl font-bold text-text-primary dark:text-white font-display">
+                  {simulationsCount}
+                </p>
               </div>
             </div>
 
-            {/* Panel content */}
-            <div className="p-6 sm:p-8 lg:p-12 bg-white dark:bg-slate-800">
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-stretch">
-                {/* Left — Text & CTA */}
-                <div className="lg:col-span-2 space-y-6 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 text-primary dark:text-blue-400">
-                    <MapPin className="w-6 h-6" />
-                    <span className="text-sm font-black uppercase tracking-widest">
-                      Navegação Geográfica
-                    </span>
-                  </div>
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-text-primary dark:text-white leading-tight">
-                    Selecione um município para visualizar áreas inundadas
-                  </h3>
-                  <p className="text-text-secondary dark:text-gray-400 text-base leading-relaxed font-medium">
-                    Explore o mapa interativo para acessar simulações de
-                    inundação, cenários de ruptura de barragens e dados de macro
-                    drenagem em todo o estado do Piauí.
-                  </p>
-                  <Link
-                    href="/simulacoes"
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:bg-primary-light dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-sm hover:-translate-y-1 group w-fit mt-2"
-                    id="map-preview-cta"
-                  >
-                    Explorar Simulações
-                    <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </div>
+            <Link
+              href="/simulacoes"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-light dark:bg-slate-800 dark:hover:bg-slate-700 text-white dark:text-white font-medium rounded-lg text-sm transition-all duration-200 w-full justify-center border border-transparent dark:border-slate-700"
+              id="map-preview-cta"
+            >
+              Abrir Painel Completo
+              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
 
-                {/* Right — Interactive Map */}
-                <div className="lg:col-span-3 relative">
-                  <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-bg-tertiary dark:bg-slate-700 shadow-inner border border-border-light dark:border-slate-600">
-                    <PiauiMap />
-                  </div>
-
-                  {/* Stats badges */}
-                  <div className="absolute -bottom-5 left-4 right-4 flex justify-center gap-3 sm:gap-4 flex-wrap">
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg px-5 py-3 flex items-center gap-3 border border-border-light dark:border-slate-700">
-                      <span className="w-2.5 h-2.5 rounded-full bg-alert-red shadow-sm" />
-                      <span className="text-xs sm:text-sm font-bold text-text-primary dark:text-white">
-                        {barragens.length} Barragens
-                      </span>
-                    </div>
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg px-5 py-3 flex items-center gap-3 border border-border-light dark:border-slate-700">
-                      <span className="w-2.5 h-2.5 rounded-full bg-alert-blue shadow-sm" />
-                      <span className="text-xs sm:text-sm font-bold text-text-primary dark:text-white">
-                        {simulationsCount} Simulações
-                      </span>
-                    </div>
-                    <div className="hidden sm:flex bg-white dark:bg-slate-900 rounded-xl shadow-lg px-5 py-3 items-center gap-3 border border-border-light dark:border-slate-700">
-                      <span className="w-2.5 h-2.5 rounded-full bg-alert-green shadow-sm" />
-                      <span className="text-xs sm:text-sm font-bold text-text-primary dark:text-white">
-                        224 Municípios
-                      </span>
-                    </div>
-                  </div>
+          {/* Mapa */}
+          <div className="lg:col-span-3">
+            <div className="relative rounded-xl overflow-hidden border border-border-light dark:border-slate-800 shadow-lg dark:shadow-none bg-white dark:bg-slate-900" style={{ aspectRatio: "4/3" }}>
+              {/* Barra superior do mapa */}
+              <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-border-light dark:border-slate-800">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted dark:text-slate-500">
+                  Piauí · WGS 84
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-alert-green animate-pulse" />
+                  <span className="text-[10px] text-text-muted dark:text-slate-500 font-medium">ao vivo</span>
                 </div>
+              </div>
+              <div className="pt-9 h-full">
+                <PiauiMap />
               </div>
             </div>
           </div>

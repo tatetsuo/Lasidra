@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  created_at    DateTime @default(now())
+}
+
+model Simulation {
+  id                String   @id @default(uuid())
+  created_at        DateTime @default(now())
+  
+  // Shared fields
+  type              String   // "barragem" or "drenagem"
+  dam_id            String?
+  dam_name          String?  // null if custom point or drenagem without dam
+  latitude          Float
+  longitude         Float
+  others            String?
+  media_url         String?
+  video_url         String?
+  image_urls        String[]
+  time_of_day       String   @default("Dia de Sol")
+  image_titles      String[]
+
+  // Barragem specific
+  rupture_type      String?
+  water_reach       String?
+  water_velocity    String?
+  water_depth       String?
+  arrival_force     String?
+
+  // Drenagem specific
+  rain_intensity    String?
+  rain_duration     String?
+  rain_volume       String?
+  return_period_tag String?
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  created_at  DateTime @default(now())
+  title       String
+  description String
+  category    String
+  latitude    Float
+  longitude   Float
+  status      String   @default("pendente")
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createReport } from "@/actions/reports";
 
 interface ReportFormProps {
   latitude: number;
@@ -22,23 +22,19 @@ export default function ReportForm({ latitude, longitude, onClose, onSuccess }: 
     setLoading(true);
     setError(null);
 
-    const { error: dbError } = await supabase.from("reports").insert([
-      {
+    try {
+      await createReport({
         title,
         description,
         category,
         latitude,
-        longitude,
-        status: "pendente",
-      },
-    ]);
-
-    setLoading(false);
-
-    if (dbError) {
-      setError(dbError.message);
-    } else {
+        longitude
+      });
       onSuccess();
+    } catch (err: any) {
+      setError(err.message || "Erro ao salvar relato");
+    } finally {
+      setLoading(false);
     }
   };
 

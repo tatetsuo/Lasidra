@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, FlaskConical, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Droplets } from "lucide-react";
 import { useTheme } from "next-themes";
 
 const navItems = [
@@ -23,49 +23,49 @@ export default function Header() {
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
+      setScrolled(window.scrollY > 8);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-50 bg-white dark:bg-slate-950 transition-all duration-200 ${
         scrolled
-          ? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-header dark:shadow-[0_2px_10px_rgba(0,0,0,0.5)] border-b border-transparent dark:border-slate-800"
-          : "bg-white dark:bg-slate-900 border-b border-transparent dark:border-slate-800"
+          ? "shadow-[0_1px_0_0_rgba(15,25,35,0.08)] dark:shadow-[0_1px_0_0_rgba(255,255,255,0.06)]"
+          : "border-b border-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center justify-between h-18 sm:h-20">
-          {/* Logo — Left-aligned */}
+        <div className="relative flex items-center justify-between h-16 sm:h-18">
+
+          {/* Logo */}
           <Link
             href="/"
             className="flex items-center gap-2.5 group shrink-0"
             id="header-logo"
           >
-            <div className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary text-white transition-transform duration-300 group-hover:scale-105">
-              <FlaskConical className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary dark:bg-primary-dark text-secondary transition-transform duration-200 group-hover:scale-95">
+              <Droplets className="w-4 h-4" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl sm:text-2xl font-bold tracking-tight text-primary dark:text-white transition-colors">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-bold tracking-tight text-primary dark:text-white font-display transition-colors">
                 Lasidra
               </span>
-              <span className="text-[10px] sm:text-xs font-medium text-text-secondary dark:text-gray-400 -mt-1 tracking-wider uppercase transition-colors">
+              <span className="text-[10px] font-medium text-text-muted dark:text-slate-500 tracking-widest uppercase">
                 UFPI
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation — Centered absolutely */}
+          {/* Desktop Nav — centralizado */}
           <nav
-            className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2"
+            className="hidden lg:flex items-center gap-0.5 absolute left-1/2 -translate-x-1/2"
             id="desktop-nav"
           >
             {navItems.map((item) => {
@@ -75,47 +75,46 @@ export default function Header() {
                   key={item.href}
                   href={item.href}
                   id={`nav-${item.href.replace("/", "")}`}
-                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-250 ${
+                  className={`relative px-4 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
                     isActive
-                      ? "text-primary dark:text-blue-400 bg-primary-50 dark:bg-blue-900/30"
-                      : "text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary-50/50 dark:hover:bg-slate-800"
+                      ? "text-primary dark:text-white"
+                      : "text-text-secondary dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-primary-50/60 dark:hover:bg-white/5"
                   }`}
                 >
                   {item.label}
                   {isActive && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-secondary rounded-full" />
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-secondary rounded-full" />
                   )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Actions: Theme Toggle + Mobile Menu */}
-          <div className="flex items-center justify-end gap-2 shrink-0 lg:w-[140px]">
+          {/* Ações: Tema + Menu Mobile */}
+          <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-text-secondary hover:text-primary hover:bg-primary-50/50 transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-md text-text-muted hover:text-primary dark:text-slate-400 dark:hover:text-white hover:bg-primary-50/60 dark:hover:bg-white/5 transition-colors"
               aria-label="Alternar tema"
               id="theme-toggle"
             >
               {mounted && theme === "dark" ? (
-                <Sun className="w-5 h-5 text-secondary-light" />
+                <Sun className="w-4 h-4" />
               ) : (
-                <Moon className="w-5 h-5" />
+                <Moon className="w-4 h-4" />
               )}
             </button>
 
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-text-secondary hover:text-primary hover:bg-primary-50/50 transition-colors"
+              className="lg:hidden flex items-center justify-center w-9 h-9 rounded-md text-text-muted hover:text-primary dark:text-slate-400 dark:hover:text-white hover:bg-primary-50/60 dark:hover:bg-white/5 transition-colors"
               aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
               id="mobile-menu-toggle"
             >
               {mobileMenuOpen ? (
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               ) : (
-                <Menu className="w-5 h-5" />
+                <Menu className="w-4 h-4" />
               )}
             </button>
           </div>
@@ -124,29 +123,26 @@ export default function Header() {
 
       {/* Mobile Navigation */}
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 ${
-          mobileMenuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
+        className={`lg:hidden overflow-hidden transition-all duration-200 ease-in-out ${
+          mobileMenuOpen ? "max-h-72 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <nav
-          className="px-4 pb-4 space-y-1 border-t border-border-light dark:border-slate-800"
+          className="px-4 pb-3 pt-1 space-y-0.5 border-t border-border-light dark:border-slate-800/80"
           id="mobile-nav"
         >
-          {navItems.map((item, index) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 id={`mobile-nav-${item.href.replace("/", "")}`}
-                className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`block px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ${
                   isActive
-                    ? "text-primary dark:text-blue-400 bg-primary-50 dark:bg-blue-900/30 border-l-3 border-secondary dark:border-blue-500"
-                    : "text-text-secondary dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 hover:bg-primary-50/30 dark:hover:bg-slate-800"
+                    ? "text-primary dark:text-white bg-primary-50 dark:bg-white/5"
+                    : "text-text-secondary dark:text-slate-400 hover:text-primary dark:hover:text-white hover:bg-primary-50/50 dark:hover:bg-white/5"
                 }`}
-                style={{
-                  animationDelay: `${index * 50}ms`,
-                }}
               >
                 {item.label}
               </Link>
